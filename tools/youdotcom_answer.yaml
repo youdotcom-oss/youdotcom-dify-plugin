@@ -208,7 +208,7 @@ parameters:
           en_US: "Norway (NO)"
           zh_Hans: "挪威 (NO)"
           ja_JP: "ノルウェー (NO)"
-        value: NO
+        value: "NO"
       - label:
           en_US: "China (CN)"
           zh_Hans: "中国 (CN)"
@@ -553,7 +553,7 @@ parameters:
           en_US: "Off"
           zh_Hans: "关闭"
           ja_JP: "オフ"
-        value: off
+        value: "off"
       - label:
           en_US: "Strict"
           zh_Hans: "严格"

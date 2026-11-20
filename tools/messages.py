@@ -23,5 +23,5 @@ def emit_error(tool: Any, error: YouComError) -> Generator[ToolInvokeMessage, No
     message = str(error)
     yield tool.create_text_message(message)
     yield tool.create_json_message(
-        {"ok": False, "error": message, "status_code": error.status_code}
+        {"ok": False, **error.to_dict()}
     )

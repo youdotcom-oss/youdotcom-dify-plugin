@@ -11,21 +11,34 @@ description:
     zh_Hans: "对一个需要多步检索的问题进行研究，并返回答案和引用。可以选择花费多少力度。frontier 会作为后台任务提交，并轮询到等待上限。"
     ja_JP: "複数ステップが必要な質問を調査し、引用付きの回答を返す。力度を選べる。frontier はバックグラウンドタスクとして送り、待機上限までポーリングする。"
   llm: >
-    Deep cited research via the You.com Research API. research_effort is lite, standard, deep, exhaustive, or frontier. Optional source controls and a JSON schema.
+    Deep cited research via the You.com Research API. research_effort is lite, standard, deep, exhaustive, or frontier. Optional source controls and a JSON schema. To resume a background task, supply task_id; no new research is submitted and input and submission controls are ignored.
 parameters:
+  - name: task_id
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Task ID"
+      zh_Hans: "任务编号"
+      ja_JP: "タスク ID"
+    human_description:
+      en_US: "Resume a returned background task ID without submitting a new request. Input and submission controls are ignored. Polls up to Max wait seconds."
+      zh_Hans: "继续查询已返回的后台任务编号，不提交新请求。忽略问题和提交控制。轮询至最长等待秒数。"
+      ja_JP: "返されたバックグラウンドタスク ID を再開する。新規リクエストは送らず、質問と送信設定は無視する。最大待機秒数までポーリングする。"
+    llm_description: "Existing background task ID to poll. No new paid task is submitted. Input and submission controls are ignored; max_wait_seconds still applies."
   - name: input
     type: string
-    required: true
+    required: false
     form: llm
     label:
       en_US: "Question"
       zh_Hans: "问题"
       ja_JP: "質問"
     human_description:
-      en_US: "The research question. Maximum 40,000 characters."
-      zh_Hans: "研究问题。最多 40000 个字符。"
-      ja_JP: "調査する質問。最大 40000 文字。"
-    llm_description: "Research question, up to 40000 characters."
+      en_US: "The research question. Required unless Task ID is provided. Maximum 40,000 characters."
+      zh_Hans: "研究问题。未提供任务编号时必填。最多 40000 个字符。"
+      ja_JP: "調査する質問。タスク ID がない場合は必須。最大 40000 文字。"
+    llm_description: "Research question, up to 40000 characters. Required unless task_id is supplied."
   - name: research_effort
     type: select
     required: false
@@ -248,7 +261,7 @@ parameters:
           en_US: "Norway (NO)"
           zh_Hans: "挪威 (NO)"
           ja_JP: "ノルウェー (NO)"
-        value: NO
+        value: "NO"
       - label:
           en_US: "China (CN)"
           zh_Hans: "中国 (CN)"
@@ -380,10 +393,10 @@ parameters:
       zh_Hans: "最长等待秒数"
       ja_JP: "最大待機秒数"
     human_description:
-      en_US: "Only used for frontier. How long to poll the background task before returning the task id, from 15 to 300. Default is 180."
-      zh_Hans: "仅用于 frontier。轮询后台任务的最长秒数，15 到 300。默认 180。超时后返回任务编号。"
-      ja_JP: "frontier のときだけ使う。バックグラウンドタスクを待つ最大秒数。15 から 300。既定は 180。"
-    llm_description: "Frontier only. Seconds to poll before returning the task id. 15 to 300, default 180."
+      en_US: "Used for frontier or Task ID polling. How long to poll before returning the task id, from 15 to 300. Default is 180."
+      zh_Hans: "用于 frontier 或任务编号查询。轮询的最长秒数，15 到 300。默认 180。超时后返回任务编号。"
+      ja_JP: "frontier またはタスク ID のポーリングに使う。最大待機秒数。15 から 300。既定は 180。"
+    llm_description: "Frontier or task_id polling. Seconds to poll before returning the task id. 15 to 300, default 180."
     default: 180
     min: 15
     max: 300

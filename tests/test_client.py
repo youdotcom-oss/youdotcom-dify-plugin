@@ -1,5 +1,7 @@
 import json
+import time
 
+import gevent
 import pytest
 import requests
 
@@ -63,15 +65,23 @@ def test_401_message_does_not_include_the_key():
     assert session.calls[0]["url"] == "https://api.you.com/v1/answer"
 
 
-def test_429_spend_cap_is_not_retried():
+@pytest.mark.parametrize("payload", [
+    {"errors": [{"title": "spend_cap_exceeded"}]},
+    {"error": {"code": "spend_cap_exceeded", "message": "Limit reached", "retryable": False}},
+    {"detail": "API key spending cap reached"},
+])
+def test_429_spend_cap_is_not_retried(monkeypatch, payload):
+    slept = []
+    monkeypatch.setattr("tools.common.time.sleep", slept.append)
     session = FakeSession(
-        [FakeResponse(429, {"errors": [{"title": "spend_cap_exceeded"}]})]
+        [FakeResponse(429, payload, headers={"Retry-After": "1"})]
     )
     client = YouComClient("secret-key", session=session)
     with pytest.raises(YouComError, match="spending cap") as caught:
         client.finance_research({"input": "revenue", "research_effort": "deep"}, timeout=10)
     assert caught.value.status_code == 429
     assert len(session.calls) == 1
+    assert slept == []
     assert session.calls[0]["url"] == "https://api.you.com/v1/finance_research"
 
 
@@ -108,3 +118,53 @@ def test_research_task_get():
     assert session.calls[0]["method"] == "GET"
     assert session.calls[0]["url"] == "https://api.you.com/v1/research/task-1"
     assert session.calls[0]["json"] is None
+
+
+def test_extract_preserves_structured_error_fields_without_leaking_the_key():
+    session = FakeSession([FakeResponse(504, {
+        "error": {
+            "code": "timeout",
+            "message": "Could not fetch secret-key",
+            "retryable": True,
+            "request_id": "req-1",
+            "details": {"reason": "secret-key", "fields": ["secret-key"]},
+        },
+    })])
+    client = YouComClient("secret-key", session=session)
+    with pytest.raises(YouComError) as caught:
+        client.extract({"url": "https://example.com"}, timeout=5)
+    error = caught.value.to_dict()
+    assert error["code"] == "timeout"
+    assert error["retryable"] is True
+    assert error["request_id"] == "req-1"
+    assert error["details"] == {"reason": "[redacted]", "fields": ["[redacted]"]}
+    assert "Could not fetch [redacted]" in error["error"]
+    assert "secret-key" not in json.dumps(error)
+
+
+@pytest.mark.parametrize("rate_limited", [False, True])
+def test_research_poll_wall_time_is_bounded_including_retries(rate_limited):
+    class SlowSession(FakeSession):
+        def request(self, *args, **kwargs):
+            if rate_limited:
+                return super().request(*args, **kwargs)
+            gevent.sleep(0.2)
+            return FakeResponse(200, {"status": "running"})
+
+    session = SlowSession([
+        FakeResponse(429, {"message": "Rate limit"}, headers={"Retry-After": "1"}),
+        FakeResponse(200, {"status": "running"}),
+    ])
+    started = time.monotonic()
+    with pytest.raises(YouComError):
+        YouComClient("secret-key", session=session).research_task("task-1", timeout=0.03)
+    elapsed = time.monotonic() - started
+    assert elapsed < 0.1
+
+
+def test_research_task_id_is_encoded_as_a_single_path_component():
+    session = FakeSession([FakeResponse(200, {"status": "running"})])
+    YouComClient("secret-key", session=session).research_task("task/child?key=value#fragment", timeout=1)
+    assert session.calls[0]["url"] == (
+        "https://api.you.com/v1/research/task%2Fchild%3Fkey%3Dvalue%23fragment"
+    )

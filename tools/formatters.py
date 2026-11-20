@@ -60,6 +60,8 @@ def format_search(payload: dict[str, Any]) -> str:
                 lines.append(str(item["description"]))
             if item.get("as_of"):
                 lines.append(f"As of {item['as_of']}")
+            if item.get("attribution"):
+                lines.append(f"Attribution: {item['attribution']}")
     if payload.get("metadata", {}).get("query") if isinstance(payload.get("metadata"), dict) else False:
         lines.append(f"Query: {payload['metadata']['query']}")
     lines.append(
@@ -126,8 +128,8 @@ def format_research(payload: dict[str, Any]) -> str:
         return (
             f"Frontier research is still {status}. Task id: {task_id}. "
             "The Research API can take much longer than one tool call at this effort. "
-            "Run the question again with research_effort exhaustive if you need the answer in this step, "
-            "or raise max_wait_seconds."
+            "Call You.com Research again with this task_id to resume polling without submitting "
+            "a new paid task. max_wait_seconds controls each polling window."
         )
     output = payload.get("output") if isinstance(payload.get("output"), dict) else {}
     content = output.get("content")

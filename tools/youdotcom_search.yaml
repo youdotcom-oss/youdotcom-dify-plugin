@@ -7,11 +7,11 @@ identity:
     ja_JP: "You.com 検索"
 description:
   human:
-    en_US: "Search the live web. News articles are returned in the same results list when the query has news intent. Snippets are the default. Ask for highlights or a full page when you need more of the document."
-    zh_Hans: "搜索实时网页。查询带有新闻意图时，新闻文章会出现在同一结果列表中。默认返回摘要片段。需要更多正文时再请求相关段落或整页。"
-    ja_JP: "ライブのウェブを検索する。クエリにニュースの意図があるとき、ニュース記事は同じ結果リストに入る。既定はスニペット。文書のより多くの部分が要るときはハイライトかページ全体を指定する。"
+    en_US: "Search the live web. News articles are returned in the same results list when the query has news intent. Highlights and Core knowledge are requested by default."
+    zh_Hans: "搜索实时网页。查询带有新闻意图时，新闻文章会出现在同一结果列表中。默认请求相关段落和核心知识结果。"
+    ja_JP: "ライブのウェブを検索する。クエリにニュースの意図があるとき、ニュース記事は同じ結果リストに入る。既定ではハイライトとコアナレッジをリクエストする。"
   llm: >
-    Search the live web with You.com. News results are included in results.web when the query has news intent. Use count, freshness, country, language, safesearch, domain filters, and optional highlights or full-page content.
+    Search the live web with You.com. News results are included in results.web when the query has news intent. Highlights and Core knowledge are requested by default. Override extraction_mode for snippets only or full-page content, or set knowledge to off for web results only.
 parameters:
   - name: query
     type: string
@@ -224,7 +224,7 @@ parameters:
           en_US: "Norway (NO)"
           zh_Hans: "挪威 (NO)"
           ja_JP: "ノルウェー (NO)"
-        value: NO
+        value: "NO"
       - label:
           en_US: "China (CN)"
           zh_Hans: "中国 (CN)"
@@ -610,7 +610,7 @@ parameters:
           en_US: "Off"
           zh_Hans: "关闭"
           ja_JP: "オフ"
-        value: off
+        value: "off"
       - label:
           en_US: "Strict"
           zh_Hans: "严格"
@@ -667,14 +667,14 @@ parameters:
       en_US: "Set to core to add licensed and public knowledge results at no extra cost. Off returns web results only."
       zh_Hans: "设为 core 会额外返回授权和公开知识结果，不另收费。off 只返回网页结果。"
       ja_JP: "core にすると、追加料金なしでライセンスおよび公開ナレッジ結果が付く。off はウェブ結果のみ。"
-    llm_description: "Set to core to request knowledge results alongside web results. Off omits the knowledge parameter."
-    default: off
+    llm_description: "Defaults to core, which requests knowledge results alongside web results. Off omits the knowledge parameter."
+    default: core
     options:
       - label:
           en_US: "Off"
           zh_Hans: "关闭"
           ja_JP: "オフ"
-        value: off
+        value: "off"
       - label:
           en_US: "Core"
           zh_Hans: "核心"
@@ -692,8 +692,8 @@ parameters:
       en_US: "none returns snippets. highlights returns query-relevant passages. full_page returns markdown and/or html."
       zh_Hans: "none 返回摘要片段。highlights 返回与查询相关的段落。full_page 返回 Markdown 和/或 HTML。"
       ja_JP: "none はスニペット。highlights はクエリに関連する抜粋。full_page は Markdown と HTML。"
-    llm_description: "none for snippets, highlights for query-relevant passages, or full_page for markdown and/or html."
-    default: none
+    llm_description: "Defaults to highlights for query-relevant passages. Use none for snippets or full_page for Markdown and/or HTML."
+    default: highlights
     options:
       - label:
           en_US: "Snippets only"
@@ -719,10 +719,10 @@ parameters:
       zh_Hans: "提取来源"
       ja_JP: "抽出元"
     human_description:
-      en_US: "Where full page content comes from. blend uses cache then a live fetch. cache is cache only. fetch always crawls. Only valid with full page."
-      zh_Hans: "整页内容的来源。blend 先用缓存，没有再实时抓取。cache 只用缓存。fetch 总是实时抓取。仅整页模式有效。"
-      ja_JP: "ページ全体の取得元。blend はキャッシュのあとライブ取得。cache はキャッシュのみ。fetch は常にクロール。full page のときだけ有効。"
-    llm_description: "full_page only. blend serves cache when present and crawls otherwise. cache never crawls. fetch always crawls."
+      en_US: "Where full page content comes from. blend uses cache then a live fetch. cache is cache only. fetch always crawls. Ignored unless extraction mode is full page."
+      zh_Hans: "整页内容的来源。blend 先用缓存，没有再实时抓取。cache 只用缓存。fetch 总是实时抓取。非整页模式时忽略。"
+      ja_JP: "ページ全体の取得元。blend はキャッシュのあとライブ取得。cache はキャッシュのみ。fetch は常にクロール。full page 以外では無視される。"
+    llm_description: "Ignored unless extraction_mode is full_page. blend serves cache when present and crawls otherwise. cache never crawls. fetch always crawls."
     default: blend
     options:
       - label:

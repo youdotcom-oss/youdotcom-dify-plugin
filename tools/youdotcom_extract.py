@@ -21,19 +21,24 @@ class YouComExtractTool(Tool):
             errors: list[dict[str, Any]] = []
             for url, body, timeout in calls:
                 try:
-                    results.append(client.extract(body, timeout=timeout))
+                    result = client.extract(body, timeout=timeout)
+                    results.append({**result, "url": result.get("url") or url})
                 except YouComError as exc:
-                    if exc.status_code in {401, 429}:
-                        raise
-                    errors.append({"url": url, "error": str(exc), "status_code": exc.status_code})
-            if not results:
-                detail = "; ".join(item["error"] for item in errors) or "No page content was returned."
-                raise YouComError(detail, status_code=errors[0]["status_code"] if errors else None)
+                    errors.append({"url": url, **exc.to_dict()})
+                    if exc.status_code in {401, 402, 429}:
+                        break
             payload = {
                 "endpoint": "https://ydc-index.io/v1/extract",
                 "results": results,
                 "errors": errors,
             }
+            if not results:
+                detail = "; ".join(item["error"] for item in errors) or "No page content was returned."
+                primary = next(
+                    (item for item in errors if item["status_code"] in {401, 402, 429}),
+                    errors[0] if errors else {},
+                )
+                raise YouComError(detail, status_code=primary.get("status_code"), details=payload)
         except YouComError as exc:
             yield from emit_error(self, exc)
             return

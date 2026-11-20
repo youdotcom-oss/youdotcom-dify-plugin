@@ -6,9 +6,10 @@ import json
 import re
 import time
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
 import requests
+from gevent import Timeout
 
 SEARCH_HOST = "https://ydc-index.io"
 API_HOST = "https://api.you.com"
@@ -42,9 +43,15 @@ MAX_INPUT_CHARS = 40000
 class YouComError(Exception):
     """A request that should be shown to the user, with the API key removed."""
 
-    def __init__(self, message: str, status_code: int | None = None) -> None:
+    def __init__(
+        self, message: str, status_code: int | None = None, *, details: dict[str, Any] | None = None
+    ) -> None:
         super().__init__(message)
         self.status_code = status_code
+        self.details = details or {}
+
+    def to_dict(self) -> dict[str, Any]:
+        return {**self.details, "error": str(self), "status_code": self.status_code}
 
 
 def credential_key(credentials: dict[str, Any] | None) -> str:
@@ -81,7 +88,7 @@ def as_int(value: Any, field: str, minimum: int, maximum: int) -> int:
     if isinstance(value, bool) or (isinstance(value, float) and not value.is_integer()):
         raise YouComError(f"{field} must be a whole number from {minimum} to {maximum}.")
     try:
-        number = int(str(value).strip())
+        number = int(value) if isinstance(value, float) else int(str(value).strip())
     except (TypeError, ValueError) as exc:
         raise YouComError(f"{field} must be a whole number from {minimum} to {maximum}.") from exc
     if number < minimum or number > maximum:
@@ -192,9 +199,26 @@ def language_value(parameters: dict[str, Any], allowed: tuple[str, ...], field: 
 def parse_urls(value: Any) -> list[str]:
     urls: list[str] = []
     seen: set[str] = set()
-    for raw in split_terms(value):
-        parsed = urlparse(raw)
-        if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+    if unset(value):
+        parts = []
+    elif isinstance(value, list):
+        parts = [str(item) for item in value]
+    else:
+        # A comma is also a valid URL character; split it only before another URL.
+        parts = re.split(r",\s*(?=https?://)|\s+", str(value), flags=re.IGNORECASE)
+    for part in parts:
+        raw = part.strip()
+        if not raw:
+            continue
+        try:
+            parsed = urlparse(raw)
+            valid = (
+                parsed.scheme in {"http", "https"} and bool(parsed.hostname)
+                and (parsed.port is None or parsed.port > 0) and not re.search(r"\s", raw)
+            )
+        except ValueError:
+            valid = False
+        if not valid:
             raise YouComError(f"Each URL must be an absolute http or https address. Got: {raw}")
         if raw not in seen:
             seen.add(raw)
@@ -235,6 +259,8 @@ def require_text(value: Any, field: str, limit: int | None = None) -> str:
 
 def _error_detail(payload: Any, text: str) -> str:
     if isinstance(payload, dict):
+        if isinstance(payload.get("error"), dict):
+            return _error_detail(payload["error"], text)
         detail = payload.get("detail")
         if isinstance(detail, str) and detail.strip():
             return detail.strip()
@@ -261,6 +287,42 @@ def _error_detail(payload: Any, text: str) -> str:
     return snippet[:300] if snippet else "the API did not return a message"
 
 
+def _redact_payload(value: Any, secret: str) -> Any:
+    if isinstance(value, str):
+        return redact(value, secret)
+    if isinstance(value, list):
+        return [_redact_payload(item, secret) for item in value]
+    if isinstance(value, dict):
+        return {redact(key, secret): _redact_payload(item, secret) for key, item in value.items()}
+    return value
+
+
+def api_error_details(response: requests.Response, secret: str) -> dict[str, Any]:
+    try:
+        payload = response.json()
+    except ValueError:
+        return {}
+    if not isinstance(payload, dict):
+        return {}
+    error = payload.get("error")
+    if not isinstance(error, dict):
+        errors = payload.get("errors")
+        error = errors[0] if isinstance(errors, list) and errors and isinstance(errors[0], dict) else payload
+    fields = ("code", "retryable", "request_id", "details")
+    details = {field: error.get(field, payload.get(field)) for field in fields if field in error or field in payload}
+    return _redact_payload(details, secret)
+
+
+def is_spending_cap(response: requests.Response) -> bool:
+    try:
+        payload = response.json()
+    except ValueError:
+        payload = None
+    code = api_error_details(response, "").get("code") or ""
+    blob = f"{code} {_error_detail(payload, response.text)}".lower()
+    return "spend_cap" in blob or "spending cap" in blob
+
+
 def message_for_status(response: requests.Response, secret: str) -> str:
     text = response.text or ""
     try:
@@ -269,7 +331,6 @@ def message_for_status(response: requests.Response, secret: str) -> str:
         payload = None
     detail = redact(_error_detail(payload, text), secret)
     status = response.status_code
-    blob = detail.lower()
     if status == 401:
         return (
             "You.com rejected the API key (401). Check the key in the plugin credentials. "
@@ -286,7 +347,7 @@ def message_for_status(response: requests.Response, secret: str) -> str:
             f"{detail}"
         )
     if status == 429:
-        if "spend_cap" in blob or "spending cap" in blob:
+        if is_spending_cap(response):
             return (
                 "You.com returned 429 because this API key reached its spending cap. "
                 f"Raise or remove the cap at {KEY_URL}. Retrying will not help. {detail}"
@@ -340,7 +401,14 @@ class YouComClient:
         return self._request("POST", API_HOST, "/v1/research", body, timeout)
 
     def research_task(self, task_id: str, timeout: float) -> dict[str, Any]:
-        return self._request("GET", API_HOST, f"/v1/research/{task_id}", None, timeout)
+        if task_id in {".", ".."}:
+            raise YouComError("task_id must identify a research task.")
+        path = f"/v1/research/{quote(task_id, safe='')}"
+        # Dify uses gevent; bound the entire poll, including connection time and retries.
+        with Timeout(timeout, YouComError("The You.com research poll reached its wait limit.")):
+            return self._request(
+                "GET", API_HOST, path, None, timeout, deadline=time.monotonic() + timeout
+            )
 
     def finance_research(self, body: dict[str, Any], timeout: float) -> dict[str, Any]:
         return self._request("POST", API_HOST, "/v1/finance_research", body, timeout)
@@ -353,7 +421,13 @@ class YouComClient:
         body: dict[str, Any] | None,
         timeout: float,
         attempt: int = 0,
+        deadline: float | None = None,
     ) -> dict[str, Any]:
+        if deadline is not None:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise YouComError("The You.com research poll reached its wait limit.")
+            timeout = min(timeout, remaining)
         url = f"{host}{path}"
         try:
             response = self.session.request(
@@ -361,7 +435,7 @@ class YouComClient:
                 url,
                 headers={"X-API-Key": self.api_key, "Accept": "application/json"},
                 json=body if method != "GET" else None,
-                timeout=(10, timeout),
+                timeout=(min(10, timeout) if deadline is not None else 10, timeout),
             )
         except requests.Timeout as exc:
             raise YouComError(
@@ -371,15 +445,21 @@ class YouComClient:
         except requests.RequestException as exc:
             raise YouComError("The You.com request failed before a response arrived.") from exc
 
-        if response.status_code == 429 and attempt == 0:
+        if response.status_code == 429 and attempt == 0 and not is_spending_cap(response):
             delay = _retry_after_seconds(response)
-            if delay is not None and 0 <= delay <= 2:
+            if (
+                delay is not None and 0 <= delay <= 2
+                and (deadline is None or delay < deadline - time.monotonic())
+            ):
                 time.sleep(delay)
-                return self._request(method, host, path, body, timeout, attempt=1)
+                return self._request(method, host, path, body, timeout, attempt=1, deadline=deadline)
 
         if response.status_code >= 400:
             detail = message_for_status(response, self.api_key)
-            raise YouComError(detail, status_code=response.status_code)
+            raise YouComError(
+                detail, status_code=response.status_code,
+                details=api_error_details(response, self.api_key),
+            )
         try:
             payload = response.json()
         except ValueError as exc:

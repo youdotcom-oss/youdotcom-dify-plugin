@@ -9,6 +9,7 @@ from tools.payloads import (
     build_finance_body,
     build_research_body,
     build_search_body,
+    frontier_wait_seconds,
 )
 
 
@@ -141,3 +142,28 @@ def test_research_and_finance_bodies():
     assert finance == {"input": "Latest quarter revenue", "research_effort": "exhaustive"}
     with pytest.raises(YouComError, match="deep or exhaustive"):
         build_finance_body({"input": "revenue", "research_effort": "lite"})
+
+
+def test_whole_number_floats_are_accepted_by_all_numeric_controls():
+    search = build_search_body(
+        {"query": "x", "count": 100.0, "offset": 9.0, "extraction_mode": "none"}
+    )
+    assert search["count"] == 100
+    assert search["offset"] == 9
+    highlights = build_search_body({
+        "query": "x", "count": 50.0, "extraction_mode": "highlights",
+        "highlights_total_max_tokens": 8192.0,
+    })
+    assert highlights["extraction"]["highlights"]["total_max_tokens"] == 8192
+    full_page = build_search_body({
+        "query": "x", "extraction_mode": "full_page", "crawl_timeout": 60.0,
+    })
+    assert full_page["crawl_timeout"] == 60
+    assert build_extract_calls({"urls": "https://example.com", "timeout": 100.0})[0][1]["timeout"] == 100
+    assert frontier_wait_seconds({"max_wait_seconds": 300.0}) == 300
+
+
+@pytest.mark.parametrize("value", [True, False, 10.5, float("nan"), float("inf"), -1.0, 101.0])
+def test_numeric_controls_still_reject_fractional_nonfinite_and_out_of_range_values(value):
+    with pytest.raises(YouComError, match="count must"):
+        build_search_body({"query": "x", "count": value})
