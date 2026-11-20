@@ -5,7 +5,7 @@
 - **Author**: youdotcom
 - **Plugin name**: youcom
 - **Version**: 0.1.0
-- **Source repository**: https://github.com/youdotcom-oss/youdotcom
+- **Source repository**: https://github.com/youdotcom-oss/youdotcom-dify-plugin
 - **Contact**: api@you.com
 
 ## Submission type
@@ -91,5 +91,6 @@ A copy of the same file placed at `youdotcom/youcom-0.1.0.difypkg` fails the pac
 - `POST /v1/contents` is deprecated in the current spec. Extract does not call it.
 - Answer has no research-effort or model parameter. Research is the separate endpoint, and `standard` is its default effort.
 - Frontier research can run far longer than a tool call. The tool submits it in background mode and stops polling at `max_wait_seconds` (default 180, maximum 300), returning the task id if it is still running.
-- The source repository is https://github.com/youdotcom-oss/youdotcom.
+- The source repository is https://github.com/youdotcom-oss/youdotcom-dify-plugin.
+- Related marketplace discussion: https://github.com/langgenius/dify-plugins/issues/3869
 - Finance Research accepts `deep` and `exhaustive` only, and it does not accept source controls.
