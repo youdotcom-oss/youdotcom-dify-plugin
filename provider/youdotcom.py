@@ -8,7 +8,7 @@ from tools.common import YouComClient, YouComError
 
 class YouComProvider(ToolProvider):
     def _validate_credentials(self, credentials: dict[str, Any]) -> None:
-        api_key = str((credentials or {}).get("youcom_api_key") or "").strip()
+        api_key = str((credentials or {}).get("youdotcom_api_key") or "").strip()
         if not api_key:
             raise ToolProviderCredentialValidationError(
                 "You.com API key is required. Get one at https://you.com/platform."

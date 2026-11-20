@@ -1,9 +1,9 @@
 from tools.common import YouComError
-from tools.youcom_answer import YouComAnswerTool
-from tools.youcom_extract import YouComExtractTool
-from tools.youcom_finance_research import YouComFinanceResearchTool
-from tools.youcom_research import YouComResearchTool, run_research
-from tools.youcom_search import YouComSearchTool
+from tools.youdotcom_answer import YouComAnswerTool
+from tools.youdotcom_extract import YouComExtractTool
+from tools.youdotcom_finance_research import YouComFinanceResearchTool
+from tools.youdotcom_research import YouComResearchTool, run_research
+from tools.youdotcom_search import YouComSearchTool
 from tools.formatters import format_search
 
 
@@ -73,13 +73,13 @@ def _text(message):
 
 
 def _messages(tool_cls, parameters, credentials=None):
-    creds = {"youcom_api_key": "secret-key"} if credentials is None else credentials
+    creds = {"youdotcom_api_key": "secret-key"} if credentials is None else credentials
     return list(tool_cls.from_credentials(creds).invoke(parameters))
 
 
 def test_search_returns_json_then_text(monkeypatch):
     client = RecordingClient("secret-key")
-    _install(monkeypatch, "tools.youcom_search", client)
+    _install(monkeypatch, "tools.youdotcom_search", client)
     messages = _messages(YouComSearchTool, {"query": "headlines", "count": 2})
     assert [message.type.value for message in messages] == ["json", "text"]
     assert _json(messages[0])["results"]["web"][0]["url"].endswith("/story")
@@ -91,7 +91,7 @@ def test_search_returns_json_then_text(monkeypatch):
 
 def test_extract_continues_after_a_page_error_and_stops_on_401(monkeypatch):
     client = RecordingClient("secret-key")
-    _install(monkeypatch, "tools.youcom_extract", client)
+    _install(monkeypatch, "tools.youdotcom_extract", client)
     messages = _messages(
         YouComExtractTool,
         {"urls": "https://example.com/ok, https://example.com/missing"},
@@ -113,13 +113,13 @@ def test_extract_continues_after_a_page_error_and_stops_on_401(monkeypatch):
 
 def test_answer_and_finance_text_include_citations(monkeypatch):
     client = RecordingClient("secret-key")
-    _install(monkeypatch, "tools.youcom_answer", client)
+    _install(monkeypatch, "tools.youdotcom_answer", client)
     messages = _messages(YouComAnswerTool, {"query": "What shipped?"})
     assert _json(messages[0])["answer"].startswith("Cited")
     assert "https://example.com" in _text(messages[1])
     assert client.calls[0][0] == "answer"
 
-    _install(monkeypatch, "tools.youcom_finance_research", client)
+    _install(monkeypatch, "tools.youdotcom_finance_research", client)
     messages = _messages(
         YouComFinanceResearchTool,
         {"input": "Latest quarter revenue", "research_effort": "deep"},
@@ -133,7 +133,7 @@ def test_answer_and_finance_text_include_citations(monkeypatch):
 def test_missing_key_does_not_call_the_api(monkeypatch):
     called = []
     monkeypatch.setattr(
-        "tools.youcom_search.YouComClient",
+        "tools.youdotcom_search.YouComClient",
         lambda api_key: called.append(api_key),
     )
     messages = list(YouComSearchTool.from_credentials({}).invoke({"query": "x"}))
@@ -213,7 +213,7 @@ def test_research_tool_uses_standard_by_default(monkeypatch):
                 "warnings": [],
             }
 
-    monkeypatch.setattr("tools.youcom_research.YouComClient", Client)
+    monkeypatch.setattr("tools.youdotcom_research.YouComClient", Client)
     messages = _messages(YouComResearchTool, {"input": "Summarize the category"})
     assert seen["body"]["research_effort"] == "standard"
     assert seen["timeout"] == 45.0

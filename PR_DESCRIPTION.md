@@ -57,7 +57,7 @@ We have not installed this build on Dify Cloud or Dify Community Edition yet. Va
 
 ```text
 pytest -q
-21 passed, 5 skipped, 2 warnings in 0.53s
+21 passed, 5 skipped, 2 warnings in 0.44s
 ```
 
 The five skipped tests are live smoke calls. They run only when `YDC_API_KEY` is set, and they do not print the key. That variable was not set here.

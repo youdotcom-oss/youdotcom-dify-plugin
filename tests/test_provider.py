@@ -18,7 +18,7 @@ def test_validation_runs_a_one_result_search(monkeypatch):
             return {"results": {"web": []}}
 
     monkeypatch.setattr("provider.youdotcom.YouComClient", Client)
-    YouComProvider()._validate_credentials({"youcom_api_key": " secret-key "})
+    YouComProvider()._validate_credentials({"youdotcom_api_key": " secret-key "})
     assert seen == {
         "api_key": "secret-key",
         "body": {"query": "You.com", "count": 1},
@@ -39,5 +39,5 @@ def test_validation_rejects_a_missing_or_unauthorized_key(monkeypatch):
 
     monkeypatch.setattr("provider.youdotcom.YouComClient", Client)
     with pytest.raises(ToolProviderCredentialValidationError, match="401") as caught:
-        YouComProvider()._validate_credentials({"youcom_api_key": "secret-key"})
+        YouComProvider()._validate_credentials({"youdotcom_api_key": "secret-key"})
     assert "secret-key" not in str(caught.value)

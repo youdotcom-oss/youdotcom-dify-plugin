@@ -1,17 +1,17 @@
 identity:
-  name: youcom_search
+  name: youdotcom_answer
   author: youdotcom
   label:
-    en_US: "You.com Search"
-    zh_Hans: "You.com 搜索"
-    ja_JP: "You.com 検索"
+    en_US: "You.com Answer"
+    zh_Hans: "You.com 回答"
+    ja_JP: "You.com 回答"
 description:
   human:
-    en_US: "Search the live web. News articles are returned in the same results list when the query has news intent. Snippets are the default. Ask for highlights or a full page when you need more of the document."
-    zh_Hans: "搜索实时网页。查询带有新闻意图时，新闻文章会出现在同一结果列表中。默认返回摘要片段。需要更多正文时再请求相关段落或整页。"
-    ja_JP: "ライブのウェブを検索する。クエリにニュースの意図があるとき、ニュース記事は同じ結果リストに入る。既定はスニペット。文書のより多くの部分が要るときはハイライトかページ全体を指定する。"
+    en_US: "Get one grounded answer with inline citations from a single query. This calls the Answer API. It is not the Research API, and it has no model or research-effort parameter."
+    zh_Hans: "用一次查询得到带行内引用的依据答案。调用的是 Answer API，不是 Research API，也没有模型或研究力度参数。"
+    ja_JP: "1 回のクエリから、本文中に引用が付いた根拠のある回答を得る。呼ぶのは Answer API であり、Research API ではない。モデルや調査力度のパラメータはない。"
   llm: >
-    Search the live web with You.com. News results are included in results.web when the query has news intent. Use count, freshness, country, language, safesearch, domain filters, and optional highlights or full-page content.
+    Return a cited answer from the You.com Answer API for one query. This is not a research effort and not a selectable model.
 parameters:
   - name: query
     type: string
@@ -19,29 +19,13 @@ parameters:
     form: llm
     label:
       en_US: "Query"
-      zh_Hans: "查询"
-      ja_JP: "クエリ"
+      zh_Hans: "问题"
+      ja_JP: "質問"
     human_description:
-      en_US: "The search query. Search operators such as site:, filetype:, AND, OR, and minus are supported."
-      zh_Hans: "搜索查询。支持 site:、filetype:、AND、OR 和减号等搜索运算符。"
-      ja_JP: "検索クエリ。site:、filetype:、AND、OR、マイナスなどの検索演算子を使えます。"
-    llm_description: "Search query. Operators such as site:, filetype:, AND, OR, and a leading minus are supported."
-  - name: count
-    type: number
-    required: false
-    form: llm
-    label:
-      en_US: "Count"
-      zh_Hans: "结果数量"
-      ja_JP: "件数"
-    human_description:
-      en_US: "Maximum number of results, from 1 to 100. Highlights mode allows at most 50. Default is 10."
-      zh_Hans: "返回的最大结果数，1 到 100。highlights 模式最多 50 条。默认 10。"
-      ja_JP: "返す最大件数。1 から 100。highlights では最大 50。既定は 10。"
-    llm_description: "Maximum results to return, from 1 to 100. When extraction_mode is highlights, the maximum is 50. Default 10."
-    default: 10
-    min: 1
-    max: 100
+      en_US: "The question to answer from current web results."
+      zh_Hans: "要用当前网页结果回答的问题。"
+      ja_JP: "現在のウェブ結果から答える質問。"
+    llm_description: "The question to answer from current web results."
   - name: freshness
     type: select
     required: false
@@ -51,10 +35,10 @@ parameters:
       zh_Hans: "时效"
       ja_JP: "新しさ"
     human_description:
-      en_US: "Limit results to the past day, week, month, or year. Use Freshness range for an exact window."
-      zh_Hans: "将结果限制在过去一天、一周、一月或一年。精确日期窗口请用时效范围。"
-      ja_JP: "結果を過去1日、1週間、1か月、1年に限る。正確な期間は期間パラメータを使う。"
-    llm_description: "Recency preset: day, week, month, or year. Leave unset for no recency filter. For an exact window, set freshness_range instead."
+      en_US: "Limit supporting results to the past day, week, month, or year."
+      zh_Hans: "将支撑结果限制在过去一天、一周、一月或一年。"
+      ja_JP: "根拠にする結果を過去1日、1週間、1か月、1年に限る。"
+    llm_description: "Recency preset for supporting results: day, week, month, or year."
     default: not_specified
     options:
       - label:
@@ -91,10 +75,10 @@ parameters:
       zh_Hans: "时效范围"
       ja_JP: "期間"
     human_description:
-      en_US: "Optional exact window, formatted YYYY-MM-DDtoYYYY-MM-DD, such as 2026-01-01to2026-03-31. Overrides Freshness when set."
-      zh_Hans: "可选的精确日期窗口，格式为 YYYY-MM-DDtoYYYY-MM-DD，例如 2026-01-01to2026-03-31。设置后覆盖时效预设。"
-      ja_JP: "任意の正確な期間。形式は YYYY-MM-DDtoYYYY-MM-DD（例: 2026-01-01to2026-03-31）。指定すると新しさのプリセットより優先される。"
-    llm_description: "Optional date window YYYY-MM-DDtoYYYY-MM-DD. When set, it overrides the freshness preset."
+      en_US: "Optional exact window, YYYY-MM-DDtoYYYY-MM-DD. Overrides Freshness when set."
+      zh_Hans: "可选精确日期窗口，YYYY-MM-DDtoYYYY-MM-DD。设置后覆盖时效预设。"
+      ja_JP: "任意の正確な期間。YYYY-MM-DDtoYYYY-MM-DD。指定すると新しさより優先される。"
+    llm_description: "Optional date window YYYY-MM-DDtoYYYY-MM-DD. Overrides the freshness preset."
   - name: country
     type: select
     required: false
@@ -104,10 +88,10 @@ parameters:
       zh_Hans: "国家或地区"
       ja_JP: "国"
     human_description:
-      en_US: "Country code that focuses web results. Leave unset for no country focus."
-      zh_Hans: "决定网页结果地理侧重的国家或地区代码。不设置则不限定地区。"
-      ja_JP: "ウェブ結果の地理的な焦点になる国コード。未指定なら国で絞らない。"
-    llm_description: "Country code that focuses results. Leave unset for no country focus."
+      en_US: "Country code that focuses the web results behind the answer."
+      zh_Hans: "决定答案所依据网页结果的国家或地区代码。"
+      ja_JP: "回答の根拠になるウェブ結果の国コード。"
+    llm_description: "Country code that focuses the web results used for the answer."
     default: not_specified
     options:
       - label:
@@ -304,10 +288,10 @@ parameters:
       zh_Hans: "语言"
       ja_JP: "言語"
     human_description:
-      en_US: "BCP 47 language of the web results. Leave unset to use the API default, English."
-      zh_Hans: "网页结果的 BCP 47 语言。不设置则使用 API 默认值英语。"
-      ja_JP: "ウェブ結果の BCP 47 言語。未指定なら API の既定である英語になる。"
-    llm_description: "BCP 47 language code for web results. Leave unset for the API default (EN)."
+      en_US: "Language of the web results. The Answer API accepts fewer codes than Web Search. Japanese, Chinese, and Portuguese are not in this list."
+      zh_Hans: "网页结果的语言。Answer API 接受的语言代码少于网页搜索，列表中没有日语、中文和葡萄牙语。"
+      ja_JP: "ウェブ結果の言語。Answer API が受け付けるコードは Web Search より少なく、日本語、中国語、ポルトガル語は含まれない。"
+    llm_description: "BCP 47 language code accepted by the Answer API. Japanese, Chinese, and Portuguese codes are not accepted here."
     default: not_specified
     options:
       - label:
@@ -340,16 +324,6 @@ parameters:
           zh_Hans: "加泰罗尼亚语 (CA)"
           ja_JP: "カタルーニャ語 (CA)"
         value: CA
-      - label:
-          en_US: "Chinese (Simplified) (ZH-HANS)"
-          zh_Hans: "简体中文 (ZH-HANS)"
-          ja_JP: "中国語（簡体） (ZH-HANS)"
-        value: ZH-HANS
-      - label:
-          en_US: "Chinese (Traditional) (ZH-HANT)"
-          zh_Hans: "繁体中文 (ZH-HANT)"
-          ja_JP: "中国語（繁体） (ZH-HANT)"
-        value: ZH-HANT
       - label:
           en_US: "Croatian (HR)"
           zh_Hans: "克罗地亚语 (HR)"
@@ -441,11 +415,6 @@ parameters:
           ja_JP: "イタリア語 (IT)"
         value: IT
       - label:
-          en_US: "Japanese (JA)"
-          zh_Hans: "日语 (JA)"
-          ja_JP: "日本語 (JA)"
-        value: JA
-      - label:
           en_US: "Kannada (KN)"
           zh_Hans: "卡纳达语 (KN)"
           ja_JP: "カンナダ語 (KN)"
@@ -490,16 +459,6 @@ parameters:
           zh_Hans: "波兰语 (PL)"
           ja_JP: "ポーランド語 (PL)"
         value: PL
-      - label:
-          en_US: "Portuguese (Brazil) (PT-BR)"
-          zh_Hans: "葡萄牙语（巴西） (PT-BR)"
-          ja_JP: "ポルトガル語（ブラジル） (PT-BR)"
-        value: PT-BR
-      - label:
-          en_US: "Portuguese (Portugal) (PT-PT)"
-          zh_Hans: "葡萄牙语（葡萄牙） (PT-PT)"
-          ja_JP: "ポルトガル語（ポルトガル） (PT-PT)"
-        value: PT-PT
       - label:
           en_US: "Punjabi (PA)"
           zh_Hans: "旁遮普语 (PA)"
@@ -570,22 +529,6 @@ parameters:
           zh_Hans: "越南语 (VI)"
           ja_JP: "ベトナム語 (VI)"
         value: VI
-  - name: offset
-    type: number
-    required: false
-    form: llm
-    label:
-      en_US: "Offset"
-      zh_Hans: "偏移"
-      ja_JP: "オフセット"
-    human_description:
-      en_US: "Page offset from 0 to 9. The API skips offset multiplied by count."
-      zh_Hans: "分页偏移，0 到 9。API 会跳过 offset 乘以 count 条结果。"
-      ja_JP: "ページのオフセット。0 から 9。API は offset と count の積だけ結果を飛ばす。"
-    llm_description: "Pagination offset from 0 to 9. The API skips offset times count results."
-    default: 0
-    min: 0
-    max: 9
   - name: safesearch
     type: select
     required: false
@@ -595,9 +538,9 @@ parameters:
       zh_Hans: "安全搜索"
       ja_JP: "セーフサーチ"
     human_description:
-      en_US: "Content filter: off, moderate, or strict. Moderate is the API default."
-      zh_Hans: "内容过滤：off、moderate 或 strict。moderate 是 API 默认值。"
-      ja_JP: "コンテンツフィルタ。off、moderate、strict。moderate が API の既定。"
+      en_US: "Content filter for the results behind the answer. Moderate is the API default."
+      zh_Hans: "答案所依据结果的内容过滤。moderate 是 API 默认值。"
+      ja_JP: "回答の根拠になる結果のコンテンツフィルタ。moderate が既定。"
     llm_description: "SafeSearch filter: off, moderate, or strict. Default moderate."
     default: moderate
     options:
@@ -627,7 +570,7 @@ parameters:
     human_description:
       en_US: "Comma-separated allowlist, up to 500 domains. Cannot be combined with exclude domains or boost domains."
       zh_Hans: "逗号分隔的允许域名，最多 500 个。不能与排除域名或加权域名同时使用。"
-      ja_JP: "カンマ区切りの許可ドメイン。最大 500。除外ドメインやブーストドメインとは併用できない。"
+      ja_JP: "カンマ区切りの許可ドメイン。最大 500。除外やブーストとは併用できない。"
     llm_description: "Comma-separated domain allowlist, up to 500. Do not combine with exclude_domains or boost_domains."
   - name: exclude_domains
     type: string
@@ -638,10 +581,10 @@ parameters:
       zh_Hans: "排除域名"
       ja_JP: "除外するドメイン"
     human_description:
-      en_US: "Comma-separated denylist, up to 5000 domains. Cannot be combined with include domains."
-      zh_Hans: "逗号分隔的排除域名，最多 5000 个。不能与仅包含域名同时使用。"
-      ja_JP: "カンマ区切りの除外ドメイン。最大 5000。含めるドメインとは併用できない。"
-    llm_description: "Comma-separated domains to exclude, up to 5000. Do not combine with include_domains."
+      en_US: "Comma-separated denylist, up to 500 domains. Cannot be combined with include domains."
+      zh_Hans: "逗号分隔的排除域名，最多 500 个。不能与仅包含域名同时使用。"
+      ja_JP: "カンマ区切りの除外ドメイン。最大 500。含めるドメインとは併用できない。"
+    llm_description: "Comma-separated domains to exclude, up to 500. Do not combine with include_domains."
   - name: boost_domains
     type: string
     required: false
@@ -651,169 +594,10 @@ parameters:
       zh_Hans: "加权域名"
       ja_JP: "ブーストするドメイン"
     human_description:
-      en_US: "Comma-separated domains to rank higher without dropping other results. Up to 500. Cannot be combined with include domains."
-      zh_Hans: "逗号分隔的加权域名，最多 500 个。只提高排序，不过滤其他结果。不能与仅包含域名同时使用。"
-      ja_JP: "順位を上げるドメイン。カンマ区切り、最大 500。他の結果は残る。含めるドメインとは併用できない。"
-    llm_description: "Comma-separated domains to boost in ranking, up to 500. This is not a filter. Do not combine with include_domains."
-  - name: knowledge
-    type: select
-    required: false
-    form: llm
-    label:
-      en_US: "Knowledge"
-      zh_Hans: "知识结果"
-      ja_JP: "ナレッジ"
-    human_description:
-      en_US: "Set to core to add licensed and public knowledge results at no extra cost. Off returns web results only."
-      zh_Hans: "设为 core 会额外返回授权和公开知识结果，不另收费。off 只返回网页结果。"
-      ja_JP: "core にすると、追加料金なしでライセンスおよび公開ナレッジ結果が付く。off はウェブ結果のみ。"
-    llm_description: "Set to core to request knowledge results alongside web results. Off omits the knowledge parameter."
-    default: off
-    options:
-      - label:
-          en_US: "Off"
-          zh_Hans: "关闭"
-          ja_JP: "オフ"
-        value: off
-      - label:
-          en_US: "Core"
-          zh_Hans: "核心"
-          ja_JP: "コア"
-        value: core
-  - name: extraction_mode
-    type: select
-    required: false
-    form: llm
-    label:
-      en_US: "Extraction mode"
-      zh_Hans: "提取模式"
-      ja_JP: "抽出モード"
-    human_description:
-      en_US: "none returns snippets. highlights returns query-relevant passages. full_page returns markdown and/or html."
-      zh_Hans: "none 返回摘要片段。highlights 返回与查询相关的段落。full_page 返回 Markdown 和/或 HTML。"
-      ja_JP: "none はスニペット。highlights はクエリに関連する抜粋。full_page は Markdown と HTML。"
-    llm_description: "none for snippets, highlights for query-relevant passages, or full_page for markdown and/or html."
-    default: none
-    options:
-      - label:
-          en_US: "Snippets only"
-          zh_Hans: "仅摘要"
-          ja_JP: "スニペットのみ"
-        value: none
-      - label:
-          en_US: "Highlights"
-          zh_Hans: "相关段落"
-          ja_JP: "ハイライト"
-        value: highlights
-      - label:
-          en_US: "Full page"
-          zh_Hans: "整页"
-          ja_JP: "ページ全体"
-        value: full_page
-  - name: extraction_source
-    type: select
-    required: false
-    form: llm
-    label:
-      en_US: "Extraction source"
-      zh_Hans: "提取来源"
-      ja_JP: "抽出元"
-    human_description:
-      en_US: "Where full page content comes from. blend uses cache then a live fetch. cache is cache only. fetch always crawls. Only valid with full page."
-      zh_Hans: "整页内容的来源。blend 先用缓存，没有再实时抓取。cache 只用缓存。fetch 总是实时抓取。仅整页模式有效。"
-      ja_JP: "ページ全体の取得元。blend はキャッシュのあとライブ取得。cache はキャッシュのみ。fetch は常にクロール。full page のときだけ有効。"
-    llm_description: "full_page only. blend serves cache when present and crawls otherwise. cache never crawls. fetch always crawls."
-    default: blend
-    options:
-      - label:
-          en_US: "Blend"
-          zh_Hans: "混合"
-          ja_JP: "ブレンド"
-        value: blend
-      - label:
-          en_US: "Cache only"
-          zh_Hans: "仅缓存"
-          ja_JP: "キャッシュのみ"
-        value: cache
-      - label:
-          en_US: "Live fetch"
-          zh_Hans: "实时抓取"
-          ja_JP: "ライブ取得"
-        value: fetch
-  - name: extraction_formats
-    type: select
-    required: false
-    form: llm
-    label:
-      en_US: "Extraction formats"
-      zh_Hans: "提取格式"
-      ja_JP: "抽出形式"
-    human_description:
-      en_US: "Formats for full page content. Ignored unless extraction mode is full page."
-      zh_Hans: "整页内容的格式。仅在提取模式为整页时生效。"
-      ja_JP: "ページ全体の形式。抽出モードが full page のときだけ使う。"
-    llm_description: "full_page formats: markdown, html, or both. Default markdown."
-    default: markdown
-    options:
-      - label:
-          en_US: "Markdown"
-          zh_Hans: "Markdown"
-          ja_JP: "Markdown"
-        value: markdown
-      - label:
-          en_US: "HTML"
-          zh_Hans: "HTML"
-          ja_JP: "HTML"
-        value: html
-      - label:
-          en_US: "Markdown and HTML"
-          zh_Hans: "Markdown 和 HTML"
-          ja_JP: "Markdown と HTML"
-        value: both
-  - name: highlights_total_max_tokens
-    type: number
-    required: false
-    form: llm
-    label:
-      en_US: "Highlight token budget"
-      zh_Hans: "段落 token 上限"
-      ja_JP: "ハイライトのトークン上限"
-    human_description:
-      en_US: "Approximate token budget for highlights, from 1024 to 8192. Only valid with highlights. The API default is 8192."
-      zh_Hans: "highlights 的大致 token 上限，1024 到 8192。仅 highlights 模式有效。API 默认 8192。"
-      ja_JP: "highlights のおおよそのトークン上限。1024 から 8192。highlights のときだけ有効。API の既定は 8192。"
-    llm_description: "Optional shared token budget for highlights, 1024 to 8192. Only with extraction_mode highlights."
-    min: 1024
-    max: 8192
-  - name: crawl_timeout
-    type: number
-    required: false
-    form: llm
-    label:
-      en_US: "Crawl timeout"
-      zh_Hans: "抓取超时"
-      ja_JP: "クロールのタイムアウト"
-    human_description:
-      en_US: "Seconds to wait for a full page fetch, from 1 to 60. Only valid with full page. The API default is 10."
-      zh_Hans: "整页抓取的等待秒数，1 到 60。仅整页模式有效。API 默认 10。"
-      ja_JP: "ページ全体の取得を待つ秒数。1 から 60。full page のときだけ有効。API の既定は 10。"
-    llm_description: "Seconds to wait for full_page content, from 1 to 60. Only with extraction_mode full_page."
-    min: 1
-    max: 60
-  - name: strict_operators
-    type: boolean
-    required: false
-    form: llm
-    label:
-      en_US: "Strict operators"
-      zh_Hans: "严格运算符"
-      ja_JP: "演算子を厳密に適用"
-    human_description:
-      en_US: "When true, operators such as quoted phrases and site: must match. When false, the API may relax operators that match nothing. Has no effect with highlights."
-      zh_Hans: "为 true 时，引号短语和 site: 等运算符必须精确匹配。为 false 时，如果运算符没有命中，API 可能放宽条件。对 highlights 无效。"
-      ja_JP: "true のとき、引用句や site: は厳密に一致する必要がある。false のとき、一致がない演算子は API が緩めることがある。highlights には効かない。"
-    llm_description: "When true, search operators must match exactly. Default false. No effect with extraction_mode highlights."
-    default: false
+      en_US: "Comma-separated domains to prefer, up to 500. Can be combined with exclude domains, not with include domains."
+      zh_Hans: "逗号分隔的优先域名，最多 500 个。可以与排除域名同时使用，不能与仅包含域名同时使用。"
+      ja_JP: "優先するドメイン。カンマ区切り、最大 500。除外ドメインとは併用でき、含めるドメインとは併用できない。"
+    llm_description: "Comma-separated domains to boost, up to 500. Can be combined with exclude_domains, not with include_domains."
 extra:
   python:
-    source: tools/youcom_search.py
+    source: tools/youdotcom_answer.py

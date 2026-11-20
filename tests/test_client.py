@@ -91,7 +91,7 @@ def test_429_retries_once_when_retry_after_is_short(monkeypatch):
     assert len(session.calls) == 2
 
 
-def test_timeout_is_a_youcom_error():
+def test_timeout_is_a_youdotcom_error():
     session = FakeSession([requests.Timeout("slow")])
     client = YouComClient("secret-key", session=session)
     with pytest.raises(YouComError, match="timed out") as caught:

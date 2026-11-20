@@ -1,5 +1,5 @@
 identity:
-  name: youcom_extract
+  name: youdotcom_extract
   author: youdotcom
   label:
     en_US: "You.com Extract"
@@ -129,4 +129,4 @@ parameters:
         value: lite
 extra:
   python:
-    source: tools/youcom_extract.py
+    source: tools/youdotcom_extract.py

@@ -48,7 +48,7 @@ class YouComError(Exception):
 
 
 def credential_key(credentials: dict[str, Any] | None) -> str:
-    raw = str((credentials or {}).get("youcom_api_key") or "").strip()
+    raw = str((credentials or {}).get("youdotcom_api_key") or "").strip()
     if not raw:
         raise YouComError(
             "You.com API key is missing. Add it in the plugin credentials. "

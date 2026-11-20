@@ -128,7 +128,7 @@ workflow:
           title: Recent reviews
           tool_configurations: {}
           tool_label: You.com Search
-          tool_name: youcom_search
+          tool_name: youdotcom_search
           tool_parameters:
             query:
               type: mixed
@@ -170,7 +170,7 @@ workflow:
           title: Competitor research
           tool_configurations: {}
           tool_label: You.com Research
-          tool_name: youcom_research
+          tool_name: youdotcom_research
           tool_parameters:
             input:
               type: mixed
@@ -203,7 +203,7 @@ workflow:
           title: Cited comparison
           tool_configurations: {}
           tool_label: You.com Answer
-          tool_name: youcom_answer
+          tool_name: youdotcom_answer
           tool_parameters:
             query:
               type: mixed

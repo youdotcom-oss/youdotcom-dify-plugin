@@ -1,5 +1,5 @@
 identity:
-  name: youcom_finance_research
+  name: youdotcom_finance_research
   author: youdotcom
   label:
     en_US: "You.com Finance Research"
@@ -66,4 +66,4 @@ parameters:
     llm_description: "Optional JSON Schema object. output.content becomes JSON instead of Markdown."
 extra:
   python:
-    source: tools/youcom_finance_research.py
+    source: tools/youdotcom_finance_research.py

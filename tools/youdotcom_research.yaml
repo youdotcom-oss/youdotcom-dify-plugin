@@ -1,5 +1,5 @@
 identity:
-  name: youcom_research
+  name: youdotcom_research
   author: youdotcom
   label:
     en_US: "You.com Research"
@@ -389,4 +389,4 @@ parameters:
     max: 300
 extra:
   python:
-    source: tools/youcom_research.py
+    source: tools/youdotcom_research.py

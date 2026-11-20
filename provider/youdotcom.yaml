@@ -1,5 +1,5 @@
 credentials_for_provider:
-  youcom_api_key:
+  youdotcom_api_key:
     help:
       en_US: Get a You.com API key. Requests send it as the X-API-Key header.
       ja_JP: You.com の API キーを取得する。リクエストは X-API-Key ヘッダーで送る。
@@ -35,8 +35,8 @@ identity:
     - search
     - finance
 tools:
-  - tools/youcom_search.yaml
-  - tools/youcom_extract.yaml
-  - tools/youcom_answer.yaml
-  - tools/youcom_research.yaml
-  - tools/youcom_finance_research.yaml
+  - tools/youdotcom_search.yaml
+  - tools/youdotcom_extract.yaml
+  - tools/youdotcom_answer.yaml
+  - tools/youdotcom_research.yaml
+  - tools/youdotcom_finance_research.yaml

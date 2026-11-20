@@ -134,7 +134,7 @@ workflow:
           title: Vendor mentions
           tool_configurations: {}
           tool_label: You.com Search
-          tool_name: youcom_search
+          tool_name: youdotcom_search
           tool_parameters:
             query:
               type: mixed
@@ -170,7 +170,7 @@ workflow:
           title: Vendor site
           tool_configurations: {}
           tool_label: You.com Extract
-          tool_name: youcom_extract
+          tool_name: youdotcom_extract
           tool_parameters:
             urls:
               type: mixed
@@ -203,7 +203,7 @@ workflow:
           title: Finance brief
           tool_configurations: {}
           tool_label: You.com Finance Research
-          tool_name: youcom_finance_research
+          tool_name: youdotcom_finance_research
           tool_parameters:
             input:
               type: mixed
