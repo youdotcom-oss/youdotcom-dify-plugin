@@ -17,7 +17,7 @@ credentials_for_provider:
     url: https://you.com/platform
 extra:
   python:
-    source: provider/youcom.py
+    source: provider/youdotcom.py
 identity:
   author: youdotcom
   description:
@@ -30,7 +30,7 @@ identity:
     en_US: You.com
     ja_JP: You.com
     zh_Hans: You.com
-  name: youcom
+  name: youdotcom
   tags:
     - search
     - finance

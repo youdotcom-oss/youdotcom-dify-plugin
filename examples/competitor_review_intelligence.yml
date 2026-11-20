@@ -121,8 +121,8 @@ workflow:
         width: 244
       - data:
           desc: Recent reviews and complaints for the company.
-          provider_id: youdotcom/youcom/youcom
-          provider_name: youcom
+          provider_id: youdotcom/youdotcom/youdotcom
+          provider_name: youdotcom
           provider_type: builtin
           selected: false
           title: Recent reviews
@@ -163,8 +163,8 @@ workflow:
         width: 244
       - data:
           desc: Multi-step comparison against the named competitor.
-          provider_id: youdotcom/youcom/youcom
-          provider_name: youcom
+          provider_id: youdotcom/youdotcom/youdotcom
+          provider_name: youdotcom
           provider_type: builtin
           selected: false
           title: Competitor research
@@ -196,8 +196,8 @@ workflow:
         width: 244
       - data:
           desc: A short cited answer a sales or research reader can scan.
-          provider_id: youdotcom/youcom/youcom
-          provider_name: youcom
+          provider_id: youdotcom/youdotcom/youdotcom
+          provider_name: youdotcom
           provider_type: builtin
           selected: false
           title: Cited comparison

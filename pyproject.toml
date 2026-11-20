@@ -1,5 +1,5 @@
 [project]
-name = "youcom"
+name = "youdotcom"
 version = "0.1.0"
 description = "You.com search, extract, answer, research, and finance research tools for Dify"
 readme = "README.md"

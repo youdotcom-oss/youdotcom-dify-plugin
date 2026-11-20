@@ -1,5 +1,5 @@
 # Import this workflow after the You.com plugin is installed.
-# Reselect the You.com tools if a node is unbound. Provider id: youdotcom/youcom/youcom.
+# Reselect the You.com tools if a node is unbound. Provider id: youdotcom/youdotcom/youdotcom.
 app:
   description: Look up a supplier, read the vendor site, and pull a cited finance brief when the vendor is a public company.
   icon: "🏭"
@@ -127,8 +127,8 @@ workflow:
         width: 244
       - data:
           desc: Recent public mentions of the vendor.
-          provider_id: youdotcom/youcom/youcom
-          provider_name: youcom
+          provider_id: youdotcom/youdotcom/youdotcom
+          provider_name: youdotcom
           provider_type: builtin
           selected: false
           title: Vendor mentions
@@ -163,8 +163,8 @@ workflow:
         width: 244
       - data:
           desc: Read the vendor site the buyer supplied.
-          provider_id: youdotcom/youcom/youcom
-          provider_name: youcom
+          provider_id: youdotcom/youdotcom/youdotcom
+          provider_name: youdotcom
           provider_type: builtin
           selected: false
           title: Vendor site
@@ -196,8 +196,8 @@ workflow:
         width: 244
       - data:
           desc: Filings, fundamentals, and financial news for a public vendor.
-          provider_id: youdotcom/youcom/youcom
-          provider_name: youcom
+          provider_id: youdotcom/youdotcom/youdotcom
+          provider_name: youdotcom
           provider_type: builtin
           selected: false
           title: Finance brief

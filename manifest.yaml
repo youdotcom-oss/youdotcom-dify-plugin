@@ -20,7 +20,7 @@ meta:
     language: python
     version: "3.12"
   version: 0.0.1
-name: youcom
+name: youdotcom
 repo: https://github.com/youdotcom-oss/youdotcom-dify-plugin
 contact: api@you.com
 network:
@@ -30,7 +30,7 @@ network:
     - you.com
 plugins:
   tools:
-    - provider/youcom.yaml
+    - provider/youdotcom.yaml
 privacy: PRIVACY.md
 resource:
   memory: 268435456

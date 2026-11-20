@@ -37,10 +37,10 @@ Research effort:
 From this directory, with the Dify plugin CLI:
 
 ```bash
-dify plugin package . -o youcom-0.1.0.difypkg
+dify plugin package . -o youdotcom-0.1.0.difypkg
 ```
 
-`youcom-0.1.0.difypkg` in this directory is that package. For a marketplace submission, put it at `youdotcom/youcom/youcom-0.1.0.difypkg` in the community plugins repository. A package file sitting directly under the author folder fails the packaging check.
+`youdotcom-0.1.0.difypkg` in this directory is that package. For a marketplace submission, put it at `youdotcom/youdotcom/youdotcom-0.1.0.difypkg` in the community plugins repository. A package file sitting directly under the author folder fails the packaging check.
 
 In Dify, open Plugins, install the `.difypkg`, and paste the API key. Saving the credential runs `POST /v1/search` with `count: 1` so a bad key fails before a workflow uses it.
 
@@ -71,7 +71,7 @@ The plugin calls You.com directly. It does not read `HTTP_PROXY` or `HTTPS_PROXY
 - `competitor_review_intelligence.yml` searches recent reviews, researches the competitor, and answers a cited question.
 - `supplier_vendor_research.yml` searches a vendor, extracts the vendor site, and runs finance research when the vendor is a public company.
 
-If a tool node shows as unavailable after import, reselect You.com on that node. The provider id in the file is `youdotcom/youcom/youcom`.
+If a tool node shows as unavailable after import, reselect You.com on that node. The provider id in the file is `youdotcom/youdotcom/youdotcom`.
 
 ## Develop
 

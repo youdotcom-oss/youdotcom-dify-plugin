@@ -3,7 +3,7 @@
 ## Plugin information
 
 - **Author**: youdotcom
-- **Plugin name**: youcom
+- **Plugin name**: youdotcom
 - **Version**: 0.1.0
 - **Source repository**: https://github.com/youdotcom-oss/youdotcom-dify-plugin
 - **Contact**: api@you.com
@@ -25,7 +25,7 @@ This is the first You.com tool plugin for Dify. It gives a workspace five tools,
 
 Saving the credential runs a one-result search so a bad key fails immediately. Each tool returns a text message and a JSON message. 401, 402, 429 (including a spending cap), and timeouts are returned as errors. A 429 is retried once only when `Retry-After` is two seconds or less.
 
-Please add the file as `youdotcom/youcom/youcom-0.1.0.difypkg`.
+Please add the file as `youdotcom/youdotcom/youdotcom-0.1.0.difypkg`.
 
 ## Risk level
 
@@ -51,13 +51,13 @@ Extract asks You.com to fetch URLs the user supplies, and Finance Research sends
 
 Extract sends user-supplied `http` and `https` URLs to You.com, which fetches the pages. Other URL schemes are rejected. That is the input constraint: at most five absolute http(s) URLs per call. Finance Research sends the user's financial question to You.com and does not move money. The security boundary is the two documented hosts. The API key is sent only as `X-API-Key` to `ydc-index.io` and `api.you.com`. The plugin does not follow environment proxy variables, does not log the key, and strips the key from error text if it appears. There is no shell, SQL, filesystem, or browser access.
 
-We have not installed this build on Dify Cloud or Dify Community Edition yet. Validation so far is the unit suite, a package built with the plugin CLI 0.6.15, and the governance scripts against the layout `youdotcom/youcom/youcom-0.1.0.difypkg`.
+We have not installed this build on Dify Cloud or Dify Community Edition yet. Validation so far is the unit suite, a package built with the plugin CLI 0.6.15, and the governance scripts against the layout `youdotcom/youdotcom/youdotcom-0.1.0.difypkg`.
 
 ## Local validation
 
 ```text
 pytest -q
-21 passed, 5 skipped, 2 warnings in 0.55s
+21 passed, 5 skipped, 2 warnings in 0.53s
 ```
 
 The five skipped tests are live smoke calls. They run only when `YDC_API_KEY` is set, and they do not print the key. That variable was not set here.
@@ -66,12 +66,12 @@ The five skipped tests are live smoke calls. They run only when `YDC_API_KEY` is
 dify version
 v0.6.15
 
-dify plugin package . -o youcom-0.1.0.difypkg
+dify plugin package . -o youdotcom-0.1.0.difypkg
 ```
 
 The archive has 26 files: manifest, README, PRIVACY.md, requirements, provider, tools, and the two icons. It does not contain tests, examples, `.env`, or `PR_DESCRIPTION.md`.
 
-Governance scripts from `.github/scripts/governance` on `main`, pointed at `youdotcom/youcom/youcom-0.1.0.difypkg`:
+Governance scripts from `.github/scripts/governance` on `main`, pointed at `youdotcom/youdotcom/youdotcom-0.1.0.difypkg`:
 
 ```text
 check_packaging_rules.py  exit 0  (0 blocking findings)
@@ -79,11 +79,11 @@ check_manifest_tags.py    exit 0  (tags: search, finance)
 check_near_duplicates.py  exit 0
 ```
 
-The near-duplicate run only had this package in the tree, so it did not compare against every package already in the marketplace repository. `youdotcom/` is not an existing author directory there. `GET https://marketplace.dify.ai/api/v1/plugins/youdotcom/youcom/0.1.0` returned `plugin version not found`.
+The near-duplicate run only had this package in the tree, so it did not compare against every package already in the marketplace repository. `youdotcom/` is not an existing author directory there. `GET https://marketplace.dify.ai/api/v1/plugins/youdotcom/youdotcom/0.1.0` returned `plugin version not found`.
 
 I also ran the marketplace toolkit validators (PR body, README, manifest, package contents, secrets, binaries, dependencies, access domains, sensitive capabilities, financial-activity signals, and Python safety warnings) against this package. They reported no errors.
 
-A copy of the same file placed at `youdotcom/youcom-0.1.0.difypkg` fails the packaging rule, which is why the path above has its own plugin directory.
+A copy of the same file placed at `youdotcom/youdotcom-0.1.0.difypkg` fails the packaging rule, which is why the path above has its own plugin directory.
 
 ## Reviewer notes
 

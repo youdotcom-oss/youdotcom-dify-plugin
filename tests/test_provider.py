@@ -1,7 +1,7 @@
 import pytest
 from dify_plugin.errors.tool import ToolProviderCredentialValidationError
 
-from provider.youcom import YouComProvider
+from provider.youdotcom import YouComProvider
 from tools.common import YouComError
 
 
@@ -17,7 +17,7 @@ def test_validation_runs_a_one_result_search(monkeypatch):
             seen["timeout"] = timeout
             return {"results": {"web": []}}
 
-    monkeypatch.setattr("provider.youcom.YouComClient", Client)
+    monkeypatch.setattr("provider.youdotcom.YouComClient", Client)
     YouComProvider()._validate_credentials({"youcom_api_key": " secret-key "})
     assert seen == {
         "api_key": "secret-key",
@@ -37,7 +37,7 @@ def test_validation_rejects_a_missing_or_unauthorized_key(monkeypatch):
         def search(self, body, timeout):
             raise YouComError("You.com rejected the API key (401).", status_code=401)
 
-    monkeypatch.setattr("provider.youcom.YouComClient", Client)
+    monkeypatch.setattr("provider.youdotcom.YouComClient", Client)
     with pytest.raises(ToolProviderCredentialValidationError, match="401") as caught:
         YouComProvider()._validate_credentials({"youcom_api_key": "secret-key"})
     assert "secret-key" not in str(caught.value)
