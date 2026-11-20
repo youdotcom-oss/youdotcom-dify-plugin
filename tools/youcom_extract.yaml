@@ -1,0 +1,132 @@
+identity:
+  name: youcom_extract
+  author: youdotcom
+  label:
+    en_US: "You.com Extract"
+    zh_Hans: "You.com 提取"
+    ja_JP: "You.com 抽出"
+description:
+  human:
+    en_US: "Fetch one or more web pages or PDFs and return clean Markdown or HTML. Each URL calls the current Extract API once."
+    zh_Hans: "抓取一个或多个网页或 PDF，返回干净的 Markdown 或 HTML。每个网址调用一次当前的 Extract API。"
+    ja_JP: "1 つ以上のウェブページまたは PDF を取得し、きれいな Markdown または HTML を返す。URL ごとに現在の Extract API を 1 回呼ぶ。"
+  llm: >
+    Fetch page or PDF content for one or more http(s) URLs as markdown and/or html. Calls POST /v1/extract once per URL.
+parameters:
+  - name: urls
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: "URLs"
+      zh_Hans: "网址"
+      ja_JP: "URL"
+    human_description:
+      en_US: "One or more absolute http or https URLs, separated by commas or newlines. Maximum 5. Each URL is fetched with POST /v1/extract."
+      zh_Hans: "一个或多个绝对 http 或 https 网址，用逗号或换行分隔。最多 5 个。每个网址单独调用 POST /v1/extract。"
+      ja_JP: "絶対 http または https URL を 1 つ以上。カンマか改行で区切る。最大 5。URL ごとに POST /v1/extract を呼ぶ。"
+    llm_description: "One or more absolute http or https URLs, separated by commas or newlines. Maximum 5."
+  - name: formats
+    type: select
+    required: false
+    form: llm
+    label:
+      en_US: "Formats"
+      zh_Hans: "格式"
+      ja_JP: "形式"
+    human_description:
+      en_US: "Page content to return: markdown, html, or both."
+      zh_Hans: "返回的页面内容：markdown、html 或两者。"
+      ja_JP: "返すページ内容。markdown、html、または両方。"
+    llm_description: "Content formats: markdown, html, or both. Default markdown."
+    default: markdown
+    options:
+      - label:
+          en_US: "Markdown"
+          zh_Hans: "Markdown"
+          ja_JP: "Markdown"
+        value: markdown
+      - label:
+          en_US: "HTML"
+          zh_Hans: "HTML"
+          ja_JP: "HTML"
+        value: html
+      - label:
+          en_US: "Markdown and HTML"
+          zh_Hans: "Markdown 和 HTML"
+          ja_JP: "Markdown と HTML"
+        value: both
+  - name: extraction_source
+    type: select
+    required: false
+    form: llm
+    label:
+      en_US: "Extraction source"
+      zh_Hans: "提取来源"
+      ja_JP: "抽出元"
+    human_description:
+      en_US: "blend uses cached content when it exists and crawls otherwise. cache never crawls. fetch always crawls."
+      zh_Hans: "blend 有缓存就用缓存，否则实时抓取。cache 不抓取。fetch 总是实时抓取。"
+      ja_JP: "blend はキャッシュがあれば使い、なければクロールする。cache はクロールしない。fetch は常にクロールする。"
+    llm_description: "blend (default), cache, or fetch."
+    default: blend
+    options:
+      - label:
+          en_US: "Blend"
+          zh_Hans: "混合"
+          ja_JP: "ブレンド"
+        value: blend
+      - label:
+          en_US: "Cache only"
+          zh_Hans: "仅缓存"
+          ja_JP: "キャッシュのみ"
+        value: cache
+      - label:
+          en_US: "Live fetch"
+          zh_Hans: "实时抓取"
+          ja_JP: "ライブ取得"
+        value: fetch
+  - name: timeout
+    type: number
+    required: false
+    form: llm
+    label:
+      en_US: "Timeout"
+      zh_Hans: "超时"
+      ja_JP: "タイムアウト"
+    human_description:
+      en_US: "End-to-end seconds for each page, including cache lookup and crawl, from 2 to 100. Default is 30."
+      zh_Hans: "每个页面的端到端秒数，包含缓存查找和抓取，2 到 100。默认 30。"
+      ja_JP: "各ページのエンドツーエンド秒数。キャッシュ参照とクロールを含む。2 から 100。既定は 30。"
+    llm_description: "Seconds allowed for each URL, from 2 to 100. Default 30."
+    default: 30
+    min: 2
+    max: 100
+  - name: parse_effort
+    type: select
+    required: false
+    form: llm
+    label:
+      en_US: "PDF parse effort"
+      zh_Hans: "PDF 解析力度"
+      ja_JP: "PDF の解析力度"
+    human_description:
+      en_US: "How hard to parse PDF pages. lite reads embedded text. standard also interprets complex pages such as charts. Web pages ignore this."
+      zh_Hans: "解析 PDF 的力度。lite 读取嵌入文本。standard 还会处理图表等复杂页面。对普通网页无效。"
+      ja_JP: "PDF の解析力度。lite は埋め込みテキスト。standard は図表のような複雑なページも解釈する。ウェブページには効かない。"
+    llm_description: "PDF parse effort: lite or standard. No effect on web pages. Default standard."
+    default: standard
+    options:
+      - label:
+          en_US: "Standard"
+          zh_Hans: "标准"
+          ja_JP: "標準"
+        value: standard
+      - label:
+          en_US: "Lite"
+          zh_Hans: "轻量"
+          ja_JP: "ライト"
+        value: lite
+extra:
+  python:
+    source: tools/youcom_extract.py

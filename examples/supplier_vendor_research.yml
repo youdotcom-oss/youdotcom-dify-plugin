@@ -1,0 +1,286 @@
+# Import this workflow after the You.com plugin is installed.
+# Reselect the You.com tools if a node is unbound. Provider id: youdotcom/youcom/youcom.
+app:
+  description: Look up a supplier, read the vendor site, and pull a cited finance brief when the vendor is a public company.
+  icon: "🏭"
+  icon_background: "#FEF3C7"
+  mode: workflow
+  name: Supplier and vendor research
+  use_icon_as_answer_icon: false
+dependencies: []
+kind: app
+version: 0.3.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: ""
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ""
+      voice: ""
+  graph:
+    edges:
+      - data:
+          isInIteration: false
+          sourceType: start
+          targetType: tool
+        id: start-search
+        source: start
+        sourceHandle: source
+        target: search
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          sourceType: tool
+          targetType: tool
+        id: search-extract
+        source: search
+        sourceHandle: source
+        target: extract
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          sourceType: tool
+          targetType: tool
+        id: extract-finance
+        source: extract
+        sourceHandle: source
+        target: finance
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          sourceType: tool
+          targetType: template-transform
+        id: finance-brief
+        source: finance
+        sourceHandle: source
+        target: brief
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          sourceType: template-transform
+          targetType: end
+        id: brief-end
+        source: brief
+        sourceHandle: source
+        target: end
+        targetHandle: target
+        type: custom
+        zIndex: 0
+    nodes:
+      - data:
+          desc: Vendor name, site, and the question a buyer needs answered.
+          selected: false
+          title: Start
+          type: start
+          variables:
+            - label: Vendor
+              max_length: 200
+              options: []
+              required: true
+              type: text-input
+              variable: vendor
+            - label: Vendor website
+              max_length: 500
+              options: []
+              required: true
+              type: text-input
+              variable: website
+            - label: Question
+              max_length: 2000
+              options: []
+              required: true
+              type: paragraph
+              variable: question
+        height: 168
+        id: start
+        position:
+          x: 80
+          y: 240
+        positionAbsolute:
+          x: 80
+          y: 240
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+      - data:
+          desc: Recent public mentions of the vendor.
+          provider_id: youdotcom/youcom/youcom
+          provider_name: youcom
+          provider_type: builtin
+          selected: false
+          title: Vendor mentions
+          tool_configurations: {}
+          tool_label: You.com Search
+          tool_name: youcom_search
+          tool_parameters:
+            query:
+              type: mixed
+              value: "{{#start.vendor#}} supplier contract news"
+            count:
+              type: constant
+              value: 5
+            freshness:
+              type: constant
+              value: year
+            safesearch:
+              type: constant
+              value: moderate
+        type: tool
+        height: 120
+        id: search
+        position:
+          x: 400
+          y: 80
+        positionAbsolute:
+          x: 400
+          y: 80
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        width: 244
+      - data:
+          desc: Read the vendor site the buyer supplied.
+          provider_id: youdotcom/youcom/youcom
+          provider_name: youcom
+          provider_type: builtin
+          selected: false
+          title: Vendor site
+          tool_configurations: {}
+          tool_label: You.com Extract
+          tool_name: youcom_extract
+          tool_parameters:
+            urls:
+              type: mixed
+              value: "{{#start.website#}}"
+            formats:
+              type: constant
+              value: markdown
+            timeout:
+              type: constant
+              value: 30
+        type: tool
+        height: 120
+        id: extract
+        position:
+          x: 720
+          y: 80
+        positionAbsolute:
+          x: 720
+          y: 80
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        width: 244
+      - data:
+          desc: Filings, fundamentals, and financial news for a public vendor.
+          provider_id: youdotcom/youcom/youcom
+          provider_name: youcom
+          provider_type: builtin
+          selected: false
+          title: Finance brief
+          tool_configurations: {}
+          tool_label: You.com Finance Research
+          tool_name: youcom_finance_research
+          tool_parameters:
+            input:
+              type: mixed
+              value: "Vendor: {{#start.vendor#}}. Question: {{#start.question#}}. Use filings, reported figures, and financial news. Say when a figure is not disclosed."
+            research_effort:
+              type: constant
+              value: deep
+        type: tool
+        height: 120
+        id: finance
+        position:
+          x: 1040
+          y: 80
+        positionAbsolute:
+          x: 1040
+          y: 80
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        width: 244
+      - data:
+          desc: One note a procurement reader can pass on.
+          selected: false
+          template: "## Finance research\n{{ finance_text }}\n\n## Vendor site\n{{ extract_text }}\n\n## Recent mentions\n{{ search_text }}\n"
+          title: Vendor note
+          type: template-transform
+          variables:
+            - value_selector:
+                - finance
+                - text
+              variable: finance_text
+            - value_selector:
+                - extract
+                - text
+              variable: extract_text
+            - value_selector:
+                - search
+                - text
+              variable: search_text
+        height: 120
+        id: brief
+        position:
+          x: 1360
+          y: 220
+        positionAbsolute:
+          x: 1360
+          y: 220
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+      - data:
+          desc: ""
+          outputs:
+            - value_selector:
+                - brief
+                - output
+              variable: vendor_note
+          selected: false
+          title: End
+          type: end
+        height: 90
+        id: end
+        position:
+          x: 1680
+          y: 240
+        positionAbsolute:
+          x: 1680
+          y: 240
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.7
+  rag_pipeline_variables: []

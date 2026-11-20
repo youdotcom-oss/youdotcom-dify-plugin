@@ -1,0 +1,69 @@
+identity:
+  name: youcom_finance_research
+  author: youdotcom
+  label:
+    en_US: "You.com Finance Research"
+    zh_Hans: "You.com 金融研究"
+    ja_JP: "You.com 金融リサーチ"
+description:
+  human:
+    en_US: "Research a financial question against a finance-oriented index of filings, market data, and financial news. Returns a cited answer. Effort is deep or exhaustive."
+    zh_Hans: "针对财报、市场数据和财经新闻等金融索引研究一个金融问题，返回答案和引用。力度为 deep 或 exhaustive。"
+    ja_JP: "提出書類、市場データ、金融ニュースを含む金融向け索引で金融の質問を調べ、引用付きの回答を返す。力度は deep か exhaustive。"
+  llm: >
+    Cited financial research via the You.com Finance Research API. research_effort is deep or exhaustive. Optional JSON schema. This endpoint does not accept source_control.
+parameters:
+  - name: input
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: "Question"
+      zh_Hans: "问题"
+      ja_JP: "質問"
+    human_description:
+      en_US: "A financial research question, such as earnings, filings, or a comparison. Maximum 40,000 characters."
+      zh_Hans: "金融研究问题，例如财报、备案文件或公司对比。最多 40000 个字符。"
+      ja_JP: "決算、提出書類、企業比較などの金融調査の質問。最大 40000 文字。"
+    llm_description: "Financial research question, up to 40000 characters."
+  - name: research_effort
+    type: select
+    required: false
+    form: llm
+    label:
+      en_US: "Research effort"
+      zh_Hans: "研究力度"
+      ja_JP: "調査の力度"
+    human_description:
+      en_US: "deep is the default and stays under 120 seconds. exhaustive is the most thorough option and stays under 300 seconds. Finance Research does not offer lite, standard, or frontier."
+      zh_Hans: "deep 是默认值，在 120 秒内。exhaustive 最充分，在 300 秒内。金融研究没有 lite、standard 或 frontier。"
+      ja_JP: "deep が既定で 120 秒以内。exhaustive が最も徹底で 300 秒以内。Finance Research に lite、standard、frontier はない。"
+    llm_description: "deep (default, under 120 seconds) or exhaustive (under 300 seconds)."
+    default: deep
+    options:
+      - label:
+          en_US: "Deep"
+          zh_Hans: "深入"
+          ja_JP: "ディープ"
+        value: deep
+      - label:
+          en_US: "Exhaustive"
+          zh_Hans: "穷尽"
+          ja_JP: "徹底"
+        value: exhaustive
+  - name: output_schema
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Output schema"
+      zh_Hans: "输出结构"
+      ja_JP: "出力スキーマ"
+    human_description:
+      en_US: "Optional JSON Schema object. When set, output.content is JSON instead of Markdown. The root must be an object with additionalProperties false, and every property must be required."
+      zh_Hans: "可选的 JSON Schema 对象。设置后 output.content 是 JSON 而不是 Markdown。根必须是对象，additionalProperties 为 false，且每个属性都在 required 中。"
+      ja_JP: "任意の JSON Schema オブジェクト。指定すると output.content は JSON になる。ルートはオブジェクトで、additionalProperties は false、すべてのプロパティが required に必要。"
+    llm_description: "Optional JSON Schema object. output.content becomes JSON instead of Markdown."
+extra:
+  python:
+    source: tools/youcom_finance_research.py

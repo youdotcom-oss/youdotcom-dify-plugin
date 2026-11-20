@@ -1,0 +1,392 @@
+identity:
+  name: youcom_research
+  author: youdotcom
+  label:
+    en_US: "You.com Research"
+    zh_Hans: "You.com 研究"
+    ja_JP: "You.com リサーチ"
+description:
+  human:
+    en_US: "Run a multi-step research question and return a cited answer. Choose how much effort to spend. Frontier is submitted as a background task and polled until the wait limit."
+    zh_Hans: "对一个需要多步检索的问题进行研究，并返回答案和引用。可以选择花费多少力度。frontier 会作为后台任务提交，并轮询到等待上限。"
+    ja_JP: "複数ステップが必要な質問を調査し、引用付きの回答を返す。力度を選べる。frontier はバックグラウンドタスクとして送り、待機上限までポーリングする。"
+  llm: >
+    Deep cited research via the You.com Research API. research_effort is lite, standard, deep, exhaustive, or frontier. Optional source controls and a JSON schema.
+parameters:
+  - name: input
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: "Question"
+      zh_Hans: "问题"
+      ja_JP: "質問"
+    human_description:
+      en_US: "The research question. Maximum 40,000 characters."
+      zh_Hans: "研究问题。最多 40000 个字符。"
+      ja_JP: "調査する質問。最大 40000 文字。"
+    llm_description: "Research question, up to 40000 characters."
+  - name: research_effort
+    type: select
+    required: false
+    form: llm
+    label:
+      en_US: "Research effort"
+      zh_Hans: "研究力度"
+      ja_JP: "調査の力度"
+    human_description:
+      en_US: "lite is under about 10 seconds. standard is the default, about 10 to 30 seconds. deep is under 120 seconds. exhaustive is under 300 seconds. frontier runs in the background and can take much longer. This tool waits up to Max wait seconds, then returns the task id if it is still running."
+      zh_Hans: "lite 大约 10 秒内。standard 是默认值，大约 10 到 30 秒。deep 在 120 秒内。exhaustive 在 300 秒内。frontier 在后台运行，可能久得多。本工具最多等待最长等待秒数，若仍在运行则返回任务编号。"
+      ja_JP: "lite は約 10 秒以内。standard が既定で約 10 から 30 秒。deep は 120 秒以内。exhaustive は 300 秒以内。frontier はバックグラウンドで、ずっと長くなり得る。このツールは最大待機秒数まで待ち、まだ実行中ならタスク ID を返す。"
+    llm_description: "lite, standard (default), deep, exhaustive, or frontier. frontier is submitted with background true and polled until max_wait_seconds."
+    default: standard
+    options:
+      - label:
+          en_US: "Lite"
+          zh_Hans: "快速"
+          ja_JP: "ライト"
+        value: lite
+      - label:
+          en_US: "Standard"
+          zh_Hans: "标准"
+          ja_JP: "標準"
+        value: standard
+      - label:
+          en_US: "Deep"
+          zh_Hans: "深入"
+          ja_JP: "ディープ"
+        value: deep
+      - label:
+          en_US: "Exhaustive"
+          zh_Hans: "穷尽"
+          ja_JP: "徹底"
+        value: exhaustive
+      - label:
+          en_US: "Frontier"
+          zh_Hans: "前沿"
+          ja_JP: "フロンティア"
+        value: frontier
+  - name: freshness
+    type: select
+    required: false
+    form: llm
+    label:
+      en_US: "Freshness"
+      zh_Hans: "时效"
+      ja_JP: "新しさ"
+    human_description:
+      en_US: "Beta source control. Limit sources to the past day, week, month, or year."
+      zh_Hans: "Beta 来源控制。将来源限制在过去一天、一周、一月或一年。"
+      ja_JP: "ベータのソース制御。情報源を過去1日、1週間、1か月、1年に限る。"
+    llm_description: "Optional source_control freshness: day, week, month, or year."
+    default: not_specified
+    options:
+      - label:
+          en_US: "Not specified"
+          zh_Hans: "不指定"
+          ja_JP: "指定しない"
+        value: not_specified
+      - label:
+          en_US: "Past day"
+          zh_Hans: "过去一天"
+          ja_JP: "過去1日"
+        value: day
+      - label:
+          en_US: "Past week"
+          zh_Hans: "过去一周"
+          ja_JP: "過去1週間"
+        value: week
+      - label:
+          en_US: "Past month"
+          zh_Hans: "过去一月"
+          ja_JP: "過去1か月"
+        value: month
+      - label:
+          en_US: "Past year"
+          zh_Hans: "过去一年"
+          ja_JP: "過去1年"
+        value: year
+  - name: freshness_range
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Freshness range"
+      zh_Hans: "时效范围"
+      ja_JP: "期間"
+    human_description:
+      en_US: "Beta source control. Exact window YYYY-MM-DDtoYYYY-MM-DD. Overrides Freshness when set."
+      zh_Hans: "Beta 来源控制。精确窗口 YYYY-MM-DDtoYYYY-MM-DD。设置后覆盖时效预设。"
+      ja_JP: "ベータのソース制御。YYYY-MM-DDtoYYYY-MM-DD。指定すると新しさより優先される。"
+    llm_description: "Optional source_control date window YYYY-MM-DDtoYYYY-MM-DD."
+  - name: country
+    type: select
+    required: false
+    form: llm
+    label:
+      en_US: "Country"
+      zh_Hans: "国家或地区"
+      ja_JP: "国"
+    human_description:
+      en_US: "Beta source control. Country code that focuses web results."
+      zh_Hans: "Beta 来源控制。决定网页结果地理侧重的国家或地区代码。"
+      ja_JP: "ベータのソース制御。ウェブ結果の焦点になる国コード。"
+    llm_description: "Optional source_control country code."
+    default: not_specified
+    options:
+      - label:
+          en_US: "Not specified"
+          zh_Hans: "不指定"
+          ja_JP: "指定しない"
+        value: not_specified
+      - label:
+          en_US: "Argentina (AR)"
+          zh_Hans: "阿根廷 (AR)"
+          ja_JP: "アルゼンチン (AR)"
+        value: AR
+      - label:
+          en_US: "Australia (AU)"
+          zh_Hans: "澳大利亚 (AU)"
+          ja_JP: "オーストラリア (AU)"
+        value: AU
+      - label:
+          en_US: "Austria (AT)"
+          zh_Hans: "奥地利 (AT)"
+          ja_JP: "オーストリア (AT)"
+        value: AT
+      - label:
+          en_US: "Belgium (BE)"
+          zh_Hans: "比利时 (BE)"
+          ja_JP: "ベルギー (BE)"
+        value: BE
+      - label:
+          en_US: "Brazil (BR)"
+          zh_Hans: "巴西 (BR)"
+          ja_JP: "ブラジル (BR)"
+        value: BR
+      - label:
+          en_US: "Canada (CA)"
+          zh_Hans: "加拿大 (CA)"
+          ja_JP: "カナダ (CA)"
+        value: CA
+      - label:
+          en_US: "Chile (CL)"
+          zh_Hans: "智利 (CL)"
+          ja_JP: "チリ (CL)"
+        value: CL
+      - label:
+          en_US: "Denmark (DK)"
+          zh_Hans: "丹麦 (DK)"
+          ja_JP: "デンマーク (DK)"
+        value: DK
+      - label:
+          en_US: "Finland (FI)"
+          zh_Hans: "芬兰 (FI)"
+          ja_JP: "フィンランド (FI)"
+        value: FI
+      - label:
+          en_US: "France (FR)"
+          zh_Hans: "法国 (FR)"
+          ja_JP: "フランス (FR)"
+        value: FR
+      - label:
+          en_US: "Germany (DE)"
+          zh_Hans: "德国 (DE)"
+          ja_JP: "ドイツ (DE)"
+        value: DE
+      - label:
+          en_US: "Hong Kong (HK)"
+          zh_Hans: "中国香港 (HK)"
+          ja_JP: "香港 (HK)"
+        value: HK
+      - label:
+          en_US: "India (IN)"
+          zh_Hans: "印度 (IN)"
+          ja_JP: "インド (IN)"
+        value: IN
+      - label:
+          en_US: "Indonesia (ID)"
+          zh_Hans: "印度尼西亚 (ID)"
+          ja_JP: "インドネシア (ID)"
+        value: ID
+      - label:
+          en_US: "Italy (IT)"
+          zh_Hans: "意大利 (IT)"
+          ja_JP: "イタリア (IT)"
+        value: IT
+      - label:
+          en_US: "Japan (JP)"
+          zh_Hans: "日本 (JP)"
+          ja_JP: "日本 (JP)"
+        value: JP
+      - label:
+          en_US: "South Korea (KR)"
+          zh_Hans: "韩国 (KR)"
+          ja_JP: "韓国 (KR)"
+        value: KR
+      - label:
+          en_US: "Malaysia (MY)"
+          zh_Hans: "马来西亚 (MY)"
+          ja_JP: "マレーシア (MY)"
+        value: MY
+      - label:
+          en_US: "Mexico (MX)"
+          zh_Hans: "墨西哥 (MX)"
+          ja_JP: "メキシコ (MX)"
+        value: MX
+      - label:
+          en_US: "Netherlands (NL)"
+          zh_Hans: "荷兰 (NL)"
+          ja_JP: "オランダ (NL)"
+        value: NL
+      - label:
+          en_US: "New Zealand (NZ)"
+          zh_Hans: "新西兰 (NZ)"
+          ja_JP: "ニュージーランド (NZ)"
+        value: NZ
+      - label:
+          en_US: "Norway (NO)"
+          zh_Hans: "挪威 (NO)"
+          ja_JP: "ノルウェー (NO)"
+        value: NO
+      - label:
+          en_US: "China (CN)"
+          zh_Hans: "中国 (CN)"
+          ja_JP: "中国 (CN)"
+        value: CN
+      - label:
+          en_US: "Poland (PL)"
+          zh_Hans: "波兰 (PL)"
+          ja_JP: "ポーランド (PL)"
+        value: PL
+      - label:
+          en_US: "Portugal (PT)"
+          zh_Hans: "葡萄牙 (PT)"
+          ja_JP: "ポルトガル (PT)"
+        value: PT
+      - label:
+          en_US: "Philippines (PH)"
+          zh_Hans: "菲律宾 (PH)"
+          ja_JP: "フィリピン (PH)"
+        value: PH
+      - label:
+          en_US: "Russia (RU)"
+          zh_Hans: "俄罗斯 (RU)"
+          ja_JP: "ロシア (RU)"
+        value: RU
+      - label:
+          en_US: "Saudi Arabia (SA)"
+          zh_Hans: "沙特阿拉伯 (SA)"
+          ja_JP: "サウジアラビア (SA)"
+        value: SA
+      - label:
+          en_US: "South Africa (ZA)"
+          zh_Hans: "南非 (ZA)"
+          ja_JP: "南アフリカ (ZA)"
+        value: ZA
+      - label:
+          en_US: "Spain (ES)"
+          zh_Hans: "西班牙 (ES)"
+          ja_JP: "スペイン (ES)"
+        value: ES
+      - label:
+          en_US: "Sweden (SE)"
+          zh_Hans: "瑞典 (SE)"
+          ja_JP: "スウェーデン (SE)"
+        value: SE
+      - label:
+          en_US: "Switzerland (CH)"
+          zh_Hans: "瑞士 (CH)"
+          ja_JP: "スイス (CH)"
+        value: CH
+      - label:
+          en_US: "Taiwan (TW)"
+          zh_Hans: "中国台湾 (TW)"
+          ja_JP: "台湾 (TW)"
+        value: TW
+      - label:
+          en_US: "Turkey (TR)"
+          zh_Hans: "土耳其 (TR)"
+          ja_JP: "トルコ (TR)"
+        value: TR
+      - label:
+          en_US: "United Kingdom (GB)"
+          zh_Hans: "英国 (GB)"
+          ja_JP: "イギリス (GB)"
+        value: GB
+      - label:
+          en_US: "United States (US)"
+          zh_Hans: "美国 (US)"
+          ja_JP: "アメリカ合衆国 (US)"
+        value: US
+  - name: include_domains
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Include domains"
+      zh_Hans: "仅包含域名"
+      ja_JP: "含めるドメイン"
+    human_description:
+      en_US: "Beta source control. Allowlist up to 500 domains. Cannot be combined with exclude or boost domains."
+      zh_Hans: "Beta 来源控制。允许域名最多 500 个。不能与排除或加权域名同时使用。"
+      ja_JP: "ベータのソース制御。許可ドメインは最大 500。除外やブーストとは併用できない。"
+    llm_description: "Optional source_control allowlist, up to 500 domains. Do not combine with exclude_domains or boost_domains."
+  - name: exclude_domains
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Exclude domains"
+      zh_Hans: "排除域名"
+      ja_JP: "除外するドメイン"
+    human_description:
+      en_US: "Beta source control. Denylist up to 500 domains. The research agent will not visit these domains. Cannot be combined with include domains."
+      zh_Hans: "Beta 来源控制。排除域名最多 500 个。研究过程不会访问这些域名。不能与仅包含域名同时使用。"
+      ja_JP: "ベータのソース制御。除外ドメインは最大 500。調査はこのドメインを訪れない。含めるドメインとは併用できない。"
+    llm_description: "Optional source_control denylist, up to 500 domains. Do not combine with include_domains."
+  - name: boost_domains
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Boost domains"
+      zh_Hans: "加权域名"
+      ja_JP: "ブーストするドメイン"
+    human_description:
+      en_US: "Beta source control. Domains to rank higher, up to 500. Can be combined with exclude domains, not with include domains."
+      zh_Hans: "Beta 来源控制。加权域名最多 500 个。可以与排除域名同时使用，不能与仅包含域名同时使用。"
+      ja_JP: "ベータのソース制御。順位を上げるドメイン、最大 500。除外とは併用でき、含めるドメインとは併用できない。"
+    llm_description: "Optional source_control boost list, up to 500 domains. Not valid with include_domains."
+  - name: output_schema
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Output schema"
+      zh_Hans: "输出结构"
+      ja_JP: "出力スキーマ"
+    human_description:
+      en_US: "Optional JSON Schema object. When set, output.content is JSON instead of Markdown. Not accepted with lite. The root must be an object with additionalProperties false, and every property must be required."
+      zh_Hans: "可选的 JSON Schema 对象。设置后 output.content 是 JSON 而不是 Markdown。不能与 lite 同时使用。根必须是对象，additionalProperties 为 false，且每个属性都在 required 中。"
+      ja_JP: "任意の JSON Schema オブジェクト。指定すると output.content は Markdown ではなく JSON になる。lite では使えない。ルートはオブジェクトで、additionalProperties は false、すべてのプロパティが required に必要。"
+    llm_description: "Optional JSON Schema object. output.content becomes JSON. Not valid with research_effort lite."
+  - name: max_wait_seconds
+    type: number
+    required: false
+    form: llm
+    label:
+      en_US: "Max wait seconds"
+      zh_Hans: "最长等待秒数"
+      ja_JP: "最大待機秒数"
+    human_description:
+      en_US: "Only used for frontier. How long to poll the background task before returning the task id, from 15 to 300. Default is 180."
+      zh_Hans: "仅用于 frontier。轮询后台任务的最长秒数，15 到 300。默认 180。超时后返回任务编号。"
+      ja_JP: "frontier のときだけ使う。バックグラウンドタスクを待つ最大秒数。15 から 300。既定は 180。"
+    llm_description: "Frontier only. Seconds to poll before returning the task id. 15 to 300, default 180."
+    default: 180
+    min: 15
+    max: 300
+extra:
+  python:
+    source: tools/youcom_research.py

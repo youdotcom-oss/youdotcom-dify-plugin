@@ -1,0 +1,289 @@
+# Import this workflow after the You.com plugin is installed.
+# If a tool node is unbound, reselect You.com Search, You.com Research, or You.com Answer.
+app:
+  description: Pull recent customer reviews, research a named competitor, and draft a cited comparison.
+  icon: "🔎"
+  icon_background: "#E0E7FF"
+  mode: workflow
+  name: Competitor and customer review intelligence
+  use_icon_as_answer_icon: false
+dependencies: []
+kind: app
+version: 0.3.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: ""
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ""
+      voice: ""
+  graph:
+    edges:
+      - data:
+          isInIteration: false
+          sourceType: start
+          targetType: tool
+        id: start-search
+        source: start
+        sourceHandle: source
+        target: search
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          sourceType: tool
+          targetType: tool
+        id: search-research
+        source: search
+        sourceHandle: source
+        target: research
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          sourceType: tool
+          targetType: tool
+        id: research-answer
+        source: research
+        sourceHandle: source
+        target: answer
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          sourceType: tool
+          targetType: template-transform
+        id: answer-brief
+        source: answer
+        sourceHandle: source
+        target: brief
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          sourceType: template-transform
+          targetType: end
+        id: brief-end
+        source: brief
+        sourceHandle: source
+        target: end
+        targetHandle: target
+        type: custom
+        zIndex: 0
+    nodes:
+      - data:
+          desc: Company and the competitor to compare.
+          selected: false
+          title: Start
+          type: start
+          variables:
+            - label: Company
+              max_length: 200
+              options: []
+              required: true
+              type: text-input
+              variable: company
+            - label: Competitor
+              max_length: 200
+              options: []
+              required: true
+              type: text-input
+              variable: competitor
+        height: 140
+        id: start
+        position:
+          x: 80
+          y: 220
+        positionAbsolute:
+          x: 80
+          y: 220
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+      - data:
+          desc: Recent reviews and complaints for the company.
+          provider_id: youdotcom/youcom/youcom
+          provider_name: youcom
+          provider_type: builtin
+          selected: false
+          title: Recent reviews
+          tool_configurations: {}
+          tool_label: You.com Search
+          tool_name: youcom_search
+          tool_parameters:
+            query:
+              type: mixed
+              value: "{{#start.company#}} customer reviews complaints praise"
+            count:
+              type: constant
+              value: 8
+            freshness:
+              type: constant
+              value: month
+            country:
+              type: constant
+              value: US
+            safesearch:
+              type: constant
+              value: moderate
+            extraction_mode:
+              type: constant
+              value: highlights
+        type: tool
+        height: 120
+        id: search
+        position:
+          x: 400
+          y: 80
+        positionAbsolute:
+          x: 400
+          y: 80
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        width: 244
+      - data:
+          desc: Multi-step comparison against the named competitor.
+          provider_id: youdotcom/youcom/youcom
+          provider_name: youcom
+          provider_type: builtin
+          selected: false
+          title: Competitor research
+          tool_configurations: {}
+          tool_label: You.com Research
+          tool_name: youcom_research
+          tool_parameters:
+            input:
+              type: mixed
+              value: "Compare {{#start.company#}} with {{#start.competitor#}}. Cover product positioning, recent customer sentiment, and the points a buyer would use to choose one over the other. Cite sources."
+            research_effort:
+              type: constant
+              value: standard
+            freshness:
+              type: constant
+              value: month
+        type: tool
+        height: 120
+        id: research
+        position:
+          x: 720
+          y: 80
+        positionAbsolute:
+          x: 720
+          y: 80
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        width: 244
+      - data:
+          desc: A short cited answer a sales or research reader can scan.
+          provider_id: youdotcom/youcom/youcom
+          provider_name: youcom
+          provider_type: builtin
+          selected: false
+          title: Cited comparison
+          tool_configurations: {}
+          tool_label: You.com Answer
+          tool_name: youcom_answer
+          tool_parameters:
+            query:
+              type: mixed
+              value: "In one short answer, how do buyers currently describe {{#start.company#}} compared with {{#start.competitor#}}?"
+            freshness:
+              type: constant
+              value: month
+            safesearch:
+              type: constant
+              value: moderate
+        type: tool
+        height: 120
+        id: answer
+        position:
+          x: 1040
+          y: 80
+        positionAbsolute:
+          x: 1040
+          y: 80
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        width: 244
+      - data:
+          desc: Join the three tool texts into one brief.
+          selected: false
+          template: "## Cited comparison\n{{ answer_text }}\n\n## Competitor research\n{{ research_text }}\n\n## Recent review search\n{{ search_text }}\n"
+          title: Brief
+          type: template-transform
+          variables:
+            - value_selector:
+                - answer
+                - text
+              variable: answer_text
+            - value_selector:
+                - research
+                - text
+              variable: research_text
+            - value_selector:
+                - search
+                - text
+              variable: search_text
+        height: 120
+        id: brief
+        position:
+          x: 1360
+          y: 200
+        positionAbsolute:
+          x: 1360
+          y: 200
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+      - data:
+          desc: ""
+          outputs:
+            - value_selector:
+                - brief
+                - output
+              variable: brief
+          selected: false
+          title: End
+          type: end
+        height: 90
+        id: end
+        position:
+          x: 1680
+          y: 220
+        positionAbsolute:
+          x: 1680
+          y: 220
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.7
+  rag_pipeline_variables: []

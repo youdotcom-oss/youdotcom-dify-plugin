@@ -1,0 +1,603 @@
+identity:
+  name: youcom_answer
+  author: youdotcom
+  label:
+    en_US: "You.com Answer"
+    zh_Hans: "You.com 回答"
+    ja_JP: "You.com 回答"
+description:
+  human:
+    en_US: "Get one grounded answer with inline citations from a single query. This calls the Answer API. It is not the Research API, and it has no model or research-effort parameter."
+    zh_Hans: "用一次查询得到带行内引用的依据答案。调用的是 Answer API，不是 Research API，也没有模型或研究力度参数。"
+    ja_JP: "1 回のクエリから、本文中に引用が付いた根拠のある回答を得る。呼ぶのは Answer API であり、Research API ではない。モデルや調査力度のパラメータはない。"
+  llm: >
+    Return a cited answer from the You.com Answer API for one query. This is not a research effort and not a selectable model.
+parameters:
+  - name: query
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: "Query"
+      zh_Hans: "问题"
+      ja_JP: "質問"
+    human_description:
+      en_US: "The question to answer from current web results."
+      zh_Hans: "要用当前网页结果回答的问题。"
+      ja_JP: "現在のウェブ結果から答える質問。"
+    llm_description: "The question to answer from current web results."
+  - name: freshness
+    type: select
+    required: false
+    form: llm
+    label:
+      en_US: "Freshness"
+      zh_Hans: "时效"
+      ja_JP: "新しさ"
+    human_description:
+      en_US: "Limit supporting results to the past day, week, month, or year."
+      zh_Hans: "将支撑结果限制在过去一天、一周、一月或一年。"
+      ja_JP: "根拠にする結果を過去1日、1週間、1か月、1年に限る。"
+    llm_description: "Recency preset for supporting results: day, week, month, or year."
+    default: not_specified
+    options:
+      - label:
+          en_US: "Not specified"
+          zh_Hans: "不指定"
+          ja_JP: "指定しない"
+        value: not_specified
+      - label:
+          en_US: "Past day"
+          zh_Hans: "过去一天"
+          ja_JP: "過去1日"
+        value: day
+      - label:
+          en_US: "Past week"
+          zh_Hans: "过去一周"
+          ja_JP: "過去1週間"
+        value: week
+      - label:
+          en_US: "Past month"
+          zh_Hans: "过去一月"
+          ja_JP: "過去1か月"
+        value: month
+      - label:
+          en_US: "Past year"
+          zh_Hans: "过去一年"
+          ja_JP: "過去1年"
+        value: year
+  - name: freshness_range
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Freshness range"
+      zh_Hans: "时效范围"
+      ja_JP: "期間"
+    human_description:
+      en_US: "Optional exact window, YYYY-MM-DDtoYYYY-MM-DD. Overrides Freshness when set."
+      zh_Hans: "可选精确日期窗口，YYYY-MM-DDtoYYYY-MM-DD。设置后覆盖时效预设。"
+      ja_JP: "任意の正確な期間。YYYY-MM-DDtoYYYY-MM-DD。指定すると新しさより優先される。"
+    llm_description: "Optional date window YYYY-MM-DDtoYYYY-MM-DD. Overrides the freshness preset."
+  - name: country
+    type: select
+    required: false
+    form: llm
+    label:
+      en_US: "Country"
+      zh_Hans: "国家或地区"
+      ja_JP: "国"
+    human_description:
+      en_US: "Country code that focuses the web results behind the answer."
+      zh_Hans: "决定答案所依据网页结果的国家或地区代码。"
+      ja_JP: "回答の根拠になるウェブ結果の国コード。"
+    llm_description: "Country code that focuses the web results used for the answer."
+    default: not_specified
+    options:
+      - label:
+          en_US: "Not specified"
+          zh_Hans: "不指定"
+          ja_JP: "指定しない"
+        value: not_specified
+      - label:
+          en_US: "Argentina (AR)"
+          zh_Hans: "阿根廷 (AR)"
+          ja_JP: "アルゼンチン (AR)"
+        value: AR
+      - label:
+          en_US: "Australia (AU)"
+          zh_Hans: "澳大利亚 (AU)"
+          ja_JP: "オーストラリア (AU)"
+        value: AU
+      - label:
+          en_US: "Austria (AT)"
+          zh_Hans: "奥地利 (AT)"
+          ja_JP: "オーストリア (AT)"
+        value: AT
+      - label:
+          en_US: "Belgium (BE)"
+          zh_Hans: "比利时 (BE)"
+          ja_JP: "ベルギー (BE)"
+        value: BE
+      - label:
+          en_US: "Brazil (BR)"
+          zh_Hans: "巴西 (BR)"
+          ja_JP: "ブラジル (BR)"
+        value: BR
+      - label:
+          en_US: "Canada (CA)"
+          zh_Hans: "加拿大 (CA)"
+          ja_JP: "カナダ (CA)"
+        value: CA
+      - label:
+          en_US: "Chile (CL)"
+          zh_Hans: "智利 (CL)"
+          ja_JP: "チリ (CL)"
+        value: CL
+      - label:
+          en_US: "Denmark (DK)"
+          zh_Hans: "丹麦 (DK)"
+          ja_JP: "デンマーク (DK)"
+        value: DK
+      - label:
+          en_US: "Finland (FI)"
+          zh_Hans: "芬兰 (FI)"
+          ja_JP: "フィンランド (FI)"
+        value: FI
+      - label:
+          en_US: "France (FR)"
+          zh_Hans: "法国 (FR)"
+          ja_JP: "フランス (FR)"
+        value: FR
+      - label:
+          en_US: "Germany (DE)"
+          zh_Hans: "德国 (DE)"
+          ja_JP: "ドイツ (DE)"
+        value: DE
+      - label:
+          en_US: "Hong Kong (HK)"
+          zh_Hans: "中国香港 (HK)"
+          ja_JP: "香港 (HK)"
+        value: HK
+      - label:
+          en_US: "India (IN)"
+          zh_Hans: "印度 (IN)"
+          ja_JP: "インド (IN)"
+        value: IN
+      - label:
+          en_US: "Indonesia (ID)"
+          zh_Hans: "印度尼西亚 (ID)"
+          ja_JP: "インドネシア (ID)"
+        value: ID
+      - label:
+          en_US: "Italy (IT)"
+          zh_Hans: "意大利 (IT)"
+          ja_JP: "イタリア (IT)"
+        value: IT
+      - label:
+          en_US: "Japan (JP)"
+          zh_Hans: "日本 (JP)"
+          ja_JP: "日本 (JP)"
+        value: JP
+      - label:
+          en_US: "South Korea (KR)"
+          zh_Hans: "韩国 (KR)"
+          ja_JP: "韓国 (KR)"
+        value: KR
+      - label:
+          en_US: "Malaysia (MY)"
+          zh_Hans: "马来西亚 (MY)"
+          ja_JP: "マレーシア (MY)"
+        value: MY
+      - label:
+          en_US: "Mexico (MX)"
+          zh_Hans: "墨西哥 (MX)"
+          ja_JP: "メキシコ (MX)"
+        value: MX
+      - label:
+          en_US: "Netherlands (NL)"
+          zh_Hans: "荷兰 (NL)"
+          ja_JP: "オランダ (NL)"
+        value: NL
+      - label:
+          en_US: "New Zealand (NZ)"
+          zh_Hans: "新西兰 (NZ)"
+          ja_JP: "ニュージーランド (NZ)"
+        value: NZ
+      - label:
+          en_US: "Norway (NO)"
+          zh_Hans: "挪威 (NO)"
+          ja_JP: "ノルウェー (NO)"
+        value: NO
+      - label:
+          en_US: "China (CN)"
+          zh_Hans: "中国 (CN)"
+          ja_JP: "中国 (CN)"
+        value: CN
+      - label:
+          en_US: "Poland (PL)"
+          zh_Hans: "波兰 (PL)"
+          ja_JP: "ポーランド (PL)"
+        value: PL
+      - label:
+          en_US: "Portugal (PT)"
+          zh_Hans: "葡萄牙 (PT)"
+          ja_JP: "ポルトガル (PT)"
+        value: PT
+      - label:
+          en_US: "Philippines (PH)"
+          zh_Hans: "菲律宾 (PH)"
+          ja_JP: "フィリピン (PH)"
+        value: PH
+      - label:
+          en_US: "Russia (RU)"
+          zh_Hans: "俄罗斯 (RU)"
+          ja_JP: "ロシア (RU)"
+        value: RU
+      - label:
+          en_US: "Saudi Arabia (SA)"
+          zh_Hans: "沙特阿拉伯 (SA)"
+          ja_JP: "サウジアラビア (SA)"
+        value: SA
+      - label:
+          en_US: "South Africa (ZA)"
+          zh_Hans: "南非 (ZA)"
+          ja_JP: "南アフリカ (ZA)"
+        value: ZA
+      - label:
+          en_US: "Spain (ES)"
+          zh_Hans: "西班牙 (ES)"
+          ja_JP: "スペイン (ES)"
+        value: ES
+      - label:
+          en_US: "Sweden (SE)"
+          zh_Hans: "瑞典 (SE)"
+          ja_JP: "スウェーデン (SE)"
+        value: SE
+      - label:
+          en_US: "Switzerland (CH)"
+          zh_Hans: "瑞士 (CH)"
+          ja_JP: "スイス (CH)"
+        value: CH
+      - label:
+          en_US: "Taiwan (TW)"
+          zh_Hans: "中国台湾 (TW)"
+          ja_JP: "台湾 (TW)"
+        value: TW
+      - label:
+          en_US: "Turkey (TR)"
+          zh_Hans: "土耳其 (TR)"
+          ja_JP: "トルコ (TR)"
+        value: TR
+      - label:
+          en_US: "United Kingdom (GB)"
+          zh_Hans: "英国 (GB)"
+          ja_JP: "イギリス (GB)"
+        value: GB
+      - label:
+          en_US: "United States (US)"
+          zh_Hans: "美国 (US)"
+          ja_JP: "アメリカ合衆国 (US)"
+        value: US
+  - name: language
+    type: select
+    required: false
+    form: llm
+    label:
+      en_US: "Language"
+      zh_Hans: "语言"
+      ja_JP: "言語"
+    human_description:
+      en_US: "Language of the web results. The Answer API accepts fewer codes than Web Search. Japanese, Chinese, and Portuguese are not in this list."
+      zh_Hans: "网页结果的语言。Answer API 接受的语言代码少于网页搜索，列表中没有日语、中文和葡萄牙语。"
+      ja_JP: "ウェブ結果の言語。Answer API が受け付けるコードは Web Search より少なく、日本語、中国語、ポルトガル語は含まれない。"
+    llm_description: "BCP 47 language code accepted by the Answer API. Japanese, Chinese, and Portuguese codes are not accepted here."
+    default: not_specified
+    options:
+      - label:
+          en_US: "Not specified"
+          zh_Hans: "不指定"
+          ja_JP: "指定しない"
+        value: not_specified
+      - label:
+          en_US: "Arabic (AR)"
+          zh_Hans: "阿拉伯语 (AR)"
+          ja_JP: "アラビア語 (AR)"
+        value: AR
+      - label:
+          en_US: "Basque (EU)"
+          zh_Hans: "巴斯克语 (EU)"
+          ja_JP: "バスク語 (EU)"
+        value: EU
+      - label:
+          en_US: "Bengali (BN)"
+          zh_Hans: "孟加拉语 (BN)"
+          ja_JP: "ベンガル語 (BN)"
+        value: BN
+      - label:
+          en_US: "Bulgarian (BG)"
+          zh_Hans: "保加利亚语 (BG)"
+          ja_JP: "ブルガリア語 (BG)"
+        value: BG
+      - label:
+          en_US: "Catalan (CA)"
+          zh_Hans: "加泰罗尼亚语 (CA)"
+          ja_JP: "カタルーニャ語 (CA)"
+        value: CA
+      - label:
+          en_US: "Croatian (HR)"
+          zh_Hans: "克罗地亚语 (HR)"
+          ja_JP: "クロアチア語 (HR)"
+        value: HR
+      - label:
+          en_US: "Czech (CS)"
+          zh_Hans: "捷克语 (CS)"
+          ja_JP: "チェコ語 (CS)"
+        value: CS
+      - label:
+          en_US: "Danish (DA)"
+          zh_Hans: "丹麦语 (DA)"
+          ja_JP: "デンマーク語 (DA)"
+        value: DA
+      - label:
+          en_US: "Dutch (NL)"
+          zh_Hans: "荷兰语 (NL)"
+          ja_JP: "オランダ語 (NL)"
+        value: NL
+      - label:
+          en_US: "English (EN)"
+          zh_Hans: "英语 (EN)"
+          ja_JP: "英語 (EN)"
+        value: EN
+      - label:
+          en_US: "English (UK) (EN-GB)"
+          zh_Hans: "英语（英国） (EN-GB)"
+          ja_JP: "英語（英国） (EN-GB)"
+        value: EN-GB
+      - label:
+          en_US: "Estonian (ET)"
+          zh_Hans: "爱沙尼亚语 (ET)"
+          ja_JP: "エストニア語 (ET)"
+        value: ET
+      - label:
+          en_US: "Finnish (FI)"
+          zh_Hans: "芬兰语 (FI)"
+          ja_JP: "フィンランド語 (FI)"
+        value: FI
+      - label:
+          en_US: "French (FR)"
+          zh_Hans: "法语 (FR)"
+          ja_JP: "フランス語 (FR)"
+        value: FR
+      - label:
+          en_US: "Galician (GL)"
+          zh_Hans: "加利西亚语 (GL)"
+          ja_JP: "ガリシア語 (GL)"
+        value: GL
+      - label:
+          en_US: "German (DE)"
+          zh_Hans: "德语 (DE)"
+          ja_JP: "ドイツ語 (DE)"
+        value: DE
+      - label:
+          en_US: "Greek (EL)"
+          zh_Hans: "希腊语 (EL)"
+          ja_JP: "ギリシャ語 (EL)"
+        value: EL
+      - label:
+          en_US: "Gujarati (GU)"
+          zh_Hans: "古吉拉特语 (GU)"
+          ja_JP: "グジャラート語 (GU)"
+        value: GU
+      - label:
+          en_US: "Hebrew (HE)"
+          zh_Hans: "希伯来语 (HE)"
+          ja_JP: "ヘブライ語 (HE)"
+        value: HE
+      - label:
+          en_US: "Hindi (HI)"
+          zh_Hans: "印地语 (HI)"
+          ja_JP: "ヒンディー語 (HI)"
+        value: HI
+      - label:
+          en_US: "Hungarian (HU)"
+          zh_Hans: "匈牙利语 (HU)"
+          ja_JP: "ハンガリー語 (HU)"
+        value: HU
+      - label:
+          en_US: "Icelandic (IS)"
+          zh_Hans: "冰岛语 (IS)"
+          ja_JP: "アイスランド語 (IS)"
+        value: IS
+      - label:
+          en_US: "Italian (IT)"
+          zh_Hans: "意大利语 (IT)"
+          ja_JP: "イタリア語 (IT)"
+        value: IT
+      - label:
+          en_US: "Kannada (KN)"
+          zh_Hans: "卡纳达语 (KN)"
+          ja_JP: "カンナダ語 (KN)"
+        value: KN
+      - label:
+          en_US: "Korean (KO)"
+          zh_Hans: "韩语 (KO)"
+          ja_JP: "韓国語 (KO)"
+        value: KO
+      - label:
+          en_US: "Latvian (LV)"
+          zh_Hans: "拉脱维亚语 (LV)"
+          ja_JP: "ラトビア語 (LV)"
+        value: LV
+      - label:
+          en_US: "Lithuanian (LT)"
+          zh_Hans: "立陶宛语 (LT)"
+          ja_JP: "リトアニア語 (LT)"
+        value: LT
+      - label:
+          en_US: "Malay (MS)"
+          zh_Hans: "马来语 (MS)"
+          ja_JP: "マレー語 (MS)"
+        value: MS
+      - label:
+          en_US: "Malayalam (ML)"
+          zh_Hans: "马拉雅拉姆语 (ML)"
+          ja_JP: "マラヤーラム語 (ML)"
+        value: ML
+      - label:
+          en_US: "Marathi (MR)"
+          zh_Hans: "马拉地语 (MR)"
+          ja_JP: "マラーティー語 (MR)"
+        value: MR
+      - label:
+          en_US: "Norwegian Bokmål (NB)"
+          zh_Hans: "挪威博克马尔语 (NB)"
+          ja_JP: "ノルウェー語（ブークモール） (NB)"
+        value: NB
+      - label:
+          en_US: "Polish (PL)"
+          zh_Hans: "波兰语 (PL)"
+          ja_JP: "ポーランド語 (PL)"
+        value: PL
+      - label:
+          en_US: "Punjabi (PA)"
+          zh_Hans: "旁遮普语 (PA)"
+          ja_JP: "パンジャブ語 (PA)"
+        value: PA
+      - label:
+          en_US: "Romanian (RO)"
+          zh_Hans: "罗马尼亚语 (RO)"
+          ja_JP: "ルーマニア語 (RO)"
+        value: RO
+      - label:
+          en_US: "Russian (RU)"
+          zh_Hans: "俄语 (RU)"
+          ja_JP: "ロシア語 (RU)"
+        value: RU
+      - label:
+          en_US: "Serbian (SR)"
+          zh_Hans: "塞尔维亚语 (SR)"
+          ja_JP: "セルビア語 (SR)"
+        value: SR
+      - label:
+          en_US: "Slovak (SK)"
+          zh_Hans: "斯洛伐克语 (SK)"
+          ja_JP: "スロバキア語 (SK)"
+        value: SK
+      - label:
+          en_US: "Slovenian (SL)"
+          zh_Hans: "斯洛文尼亚语 (SL)"
+          ja_JP: "スロベニア語 (SL)"
+        value: SL
+      - label:
+          en_US: "Spanish (ES)"
+          zh_Hans: "西班牙语 (ES)"
+          ja_JP: "スペイン語 (ES)"
+        value: ES
+      - label:
+          en_US: "Swedish (SV)"
+          zh_Hans: "瑞典语 (SV)"
+          ja_JP: "スウェーデン語 (SV)"
+        value: SV
+      - label:
+          en_US: "Tamil (TA)"
+          zh_Hans: "泰米尔语 (TA)"
+          ja_JP: "タミル語 (TA)"
+        value: TA
+      - label:
+          en_US: "Telugu (TE)"
+          zh_Hans: "泰卢固语 (TE)"
+          ja_JP: "テルグ語 (TE)"
+        value: TE
+      - label:
+          en_US: "Thai (TH)"
+          zh_Hans: "泰语 (TH)"
+          ja_JP: "タイ語 (TH)"
+        value: TH
+      - label:
+          en_US: "Turkish (TR)"
+          zh_Hans: "土耳其语 (TR)"
+          ja_JP: "トルコ語 (TR)"
+        value: TR
+      - label:
+          en_US: "Ukrainian (UK)"
+          zh_Hans: "乌克兰语 (UK)"
+          ja_JP: "ウクライナ語 (UK)"
+        value: UK
+      - label:
+          en_US: "Vietnamese (VI)"
+          zh_Hans: "越南语 (VI)"
+          ja_JP: "ベトナム語 (VI)"
+        value: VI
+  - name: safesearch
+    type: select
+    required: false
+    form: llm
+    label:
+      en_US: "SafeSearch"
+      zh_Hans: "安全搜索"
+      ja_JP: "セーフサーチ"
+    human_description:
+      en_US: "Content filter for the results behind the answer. Moderate is the API default."
+      zh_Hans: "答案所依据结果的内容过滤。moderate 是 API 默认值。"
+      ja_JP: "回答の根拠になる結果のコンテンツフィルタ。moderate が既定。"
+    llm_description: "SafeSearch filter: off, moderate, or strict. Default moderate."
+    default: moderate
+    options:
+      - label:
+          en_US: "Moderate"
+          zh_Hans: "中等"
+          ja_JP: "中程度"
+        value: moderate
+      - label:
+          en_US: "Off"
+          zh_Hans: "关闭"
+          ja_JP: "オフ"
+        value: off
+      - label:
+          en_US: "Strict"
+          zh_Hans: "严格"
+          ja_JP: "厳格"
+        value: strict
+  - name: include_domains
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Include domains"
+      zh_Hans: "仅包含域名"
+      ja_JP: "含めるドメイン"
+    human_description:
+      en_US: "Comma-separated allowlist, up to 500 domains. Cannot be combined with exclude domains or boost domains."
+      zh_Hans: "逗号分隔的允许域名，最多 500 个。不能与排除域名或加权域名同时使用。"
+      ja_JP: "カンマ区切りの許可ドメイン。最大 500。除外やブーストとは併用できない。"
+    llm_description: "Comma-separated domain allowlist, up to 500. Do not combine with exclude_domains or boost_domains."
+  - name: exclude_domains
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Exclude domains"
+      zh_Hans: "排除域名"
+      ja_JP: "除外するドメイン"
+    human_description:
+      en_US: "Comma-separated denylist, up to 500 domains. Cannot be combined with include domains."
+      zh_Hans: "逗号分隔的排除域名，最多 500 个。不能与仅包含域名同时使用。"
+      ja_JP: "カンマ区切りの除外ドメイン。最大 500。含めるドメインとは併用できない。"
+    llm_description: "Comma-separated domains to exclude, up to 500. Do not combine with include_domains."
+  - name: boost_domains
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: "Boost domains"
+      zh_Hans: "加权域名"
+      ja_JP: "ブーストするドメイン"
+    human_description:
+      en_US: "Comma-separated domains to prefer, up to 500. Can be combined with exclude domains, not with include domains."
+      zh_Hans: "逗号分隔的优先域名，最多 500 个。可以与排除域名同时使用，不能与仅包含域名同时使用。"
+      ja_JP: "優先するドメイン。カンマ区切り、最大 500。除外ドメインとは併用でき、含めるドメインとは併用できない。"
+    llm_description: "Comma-separated domains to boost, up to 500. Can be combined with exclude_domains, not with include_domains."
+extra:
+  python:
+    source: tools/youcom_answer.py
