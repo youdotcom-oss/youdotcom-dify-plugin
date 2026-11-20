@@ -21,7 +21,7 @@ meta:
     version: "3.12"
   version: 0.0.1
 name: youcom
-repo: https://github.com/youdotcom-oss/dify-youcom
+repo: https://github.com/youdotcom-oss/youdotcom
 contact: api@you.com
 network:
   domains:

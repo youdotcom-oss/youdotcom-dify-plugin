@@ -94,7 +94,7 @@ Extract fetches URLs you supply, through You.com, and Finance Research handles f
 
 ## Source
 
-The plugin source is published at <https://github.com/youdotcom-oss/dify-youcom>. That repository is the public home for this package. If it is not up yet, publish this directory there before the marketplace listing goes live, or the link will not resolve.
+The plugin source is published at <https://github.com/youdotcom-oss/youdotcom>.
 
 ## Maintainer
 
